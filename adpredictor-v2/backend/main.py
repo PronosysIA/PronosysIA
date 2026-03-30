@@ -39,7 +39,12 @@ PRICE_IDS = {
     "individual": os.getenv("PRICE_INDIVIDUAL", "price_1T8gBcCYNAXNA5JejwvshLJS"),
 }
 
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+async def startup():
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"DB init warning: {e}")
 
 app = FastAPI(title="PronosysIA API", version="2.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
