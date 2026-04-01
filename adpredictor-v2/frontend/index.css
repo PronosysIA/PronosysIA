@@ -206,3 +206,124 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
+
+/* ===== PRONOSYSIA IDENTITY SYSTEM ===== */
+
+/* Sidebar: fixed on mobile, sticky on desktop */
+.lg-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+@media (min-width: 1024px) {
+  .lg-sidebar {
+    position: sticky;
+    transform: translateX(0) !important;
+  }
+}
+
+/* Responsive grid helpers */
+@media (min-width: 640px) {
+  .sm\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .sm\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+@media (min-width: 768px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Hide on desktop */
+@media (min-width: 1024px) {
+  .lg\:hidden { display: none !important; }
+}
+
+/* Sidebar translate classes */
+.translate-x-0 { transform: translateX(0) !important; }
+.-translate-x-full { transform: translateX(-100%) !important; }
+
+/* Transition */
+.transition-transform { transition-property: transform; }
+.duration-300 { transition-duration: 300ms; }
+.ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+
+/* Subtle gold grid background on main content */
+.pn-bg-grid {
+  background-image:
+    linear-gradient(rgba(198,161,91,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(198,161,91,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* PronosysIA brand name treatment */
+.pn-brand {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: white;
+}
+.pn-brand-ia { color: #C6A15B; }
+
+/* Section label with gold line */
+.pn-section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #2A2A2A;
+}
+.pn-section-label::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 1px;
+  background: #C6A15B;
+  flex-shrink: 0;
+}
+
+/* Stat card bottom accent */
+.stat-accent-line {
+  height: 2px;
+  margin-top: 14px;
+  background: linear-gradient(90deg, #C6A15B 0%, rgba(198,161,91,0.1) 60%, transparent 100%);
+  border-radius: 1px;
+}
+
+/* Card corner glow accent */
+.card-corner-accent {
+  position: relative;
+  overflow: hidden;
+}
+.card-corner-accent::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 70px; height: 70px;
+  background: linear-gradient(225deg, rgba(198,161,91,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.card-corner-accent::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(198,161,91,0.3), transparent);
+  pointer-events: none;
+}
+
+/* Mobile bottom safe area */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Responsive padding on content */
+@media (max-width: 640px) {
+  .pn-content-pad { padding: 20px 16px 88px; }
+}
+@media (min-width: 641px) and (max-width: 1023px) {
+  .pn-content-pad { padding: 32px 28px 88px; }
+}
+@media (min-width: 1024px) {
+  .pn-content-pad { padding: 44px 48px 44px; }
+}

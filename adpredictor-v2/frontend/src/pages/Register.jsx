@@ -1,34 +1,181 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import LOGO from "../logo.js";
+
+const LogoMark = () => (
+  <div style={{
+    width: "40px", height: "40px",
+    background: "linear-gradient(135deg, rgba(198,161,91,0.15) 0%, rgba(198,161,91,0.05) 100%)",
+    border: "1px solid rgba(198,161,91,0.25)",
+    borderRadius: "11px",
+    display: "flex", alignItems: "center", justifyContent: "center",
+  }}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  </div>
+);
+
 export default function Register() {
-  const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); if (password.length < 6) { setError("6 caracteres minimum."); return; }
-    setError(""); setLoading(true);
+    e.preventDefault();
+    if (password.length < 6) { setError("6 caracteres minimum."); return; }
+    setError("");
+    setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, password }) });
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
       const data = await res.json();
       if (!res.ok) { setError(data.detail || "Erreur"); setLoading(false); return; }
-      localStorage.setItem("token", data.access_token); localStorage.setItem("user", JSON.stringify(data.user)); navigate("/dashboard");
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/dashboard");
     } catch { setError("Erreur."); } finally { setLoading(false); }
   };
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#0A0A0A" }}>
-      <div className="w-full max-w-sm animate-fadeInUp">
-        <div className="mb-12"><Link to="/"><img src={LOGO} alt="PronosysIA" className="h-8" /></Link></div>
-        <h1 className="font-display text-3xl italic text-white mb-2">Creer un compte.</h1>
-        <p className="text-sm mb-10" style={{ color: "#555" }}>3 analyses gratuites — Sans CB</p>
-        {error && <div className="card px-4 py-3 mb-6 text-sm" style={{ color: "#F87171" }}>{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div><label className="text-[11px] uppercase tracking-widest block mb-2" style={{ color: "#555" }}>Prenom</label><input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Noah" className="input-dark" /></div>
-          <div><label className="text-[11px] uppercase tracking-widest block mb-2" style={{ color: "#555" }}>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="votre@email.com" className="input-dark" /></div>
-          <div><label className="text-[11px] uppercase tracking-widest block mb-2" style={{ color: "#555" }}>Mot de passe</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="6 caracteres minimum" className="input-dark" /></div>
-          <button type="submit" disabled={loading} className="btn-primary w-full py-3 disabled:opacity-50">{loading ? "Creation..." : "Creer mon compte"}</button>
+    <div style={{ minHeight: "100vh", display: "flex", background: "#090909", position: "relative", overflow: "hidden" }}>
+      {/* Background gold grid */}
+      <div style={{
+        position: "absolute", inset: 0,
+        backgroundImage: "linear-gradient(rgba(198,161,91,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(198,161,91,0.018) 1px, transparent 1px)",
+        backgroundSize: "48px 48px",
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "absolute", top: "30%", left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "500px", height: "500px",
+        background: "radial-gradient(circle, rgba(198,161,91,0.04) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+
+      <div style={{
+        width: "100%", maxWidth: "380px",
+        margin: "auto",
+        padding: "40px 24px",
+        position: "relative",
+        zIndex: 1,
+      }} className="animate-fadeInUp">
+        {/* Brand */}
+        <div style={{ marginBottom: "44px" }}>
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
+            <LogoMark />
+            <div style={{ fontWeight: 800, fontSize: "18px", letterSpacing: "-0.03em", color: "white" }}>
+              Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Heading */}
+        <div style={{ marginBottom: "32px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+            <div style={{ width: "20px", height: "1px", background: "#C6A15B" }} />
+            <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#333" }}>Inscription</span>
+          </div>
+          <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "32px", fontStyle: "italic", color: "white", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+            Creer un compte.
+          </h1>
+          <p style={{ marginTop: "8px", fontSize: "13px", color: "#333" }}>3 analyses gratuites — Sans CB</p>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div style={{
+            background: "rgba(248,113,113,0.06)",
+            border: "1px solid rgba(248,113,113,0.15)",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            marginBottom: "20px",
+            fontSize: "13px",
+            color: "#F87171",
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#2A2A2A", marginBottom: "8px" }}>
+              Prenom
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+              placeholder="Noah"
+              className="input-dark"
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#2A2A2A", marginBottom: "8px" }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              placeholder="votre@email.com"
+              className="input-dark"
+            />
+          </div>
+
+          <div style={{ marginBottom: "28px" }}>
+            <label style={{ display: "block", fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#2A2A2A", marginBottom: "8px" }}>
+              Mot de passe
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              placeholder="6 caracteres minimum"
+              className="input-dark"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "13px",
+              background: loading ? "#1A1A1A" : "white",
+              color: "#090909",
+              fontWeight: 700,
+              fontSize: "14px",
+              borderRadius: "9px",
+              border: "none",
+              cursor: loading ? "not-allowed" : "pointer",
+              transition: "all 0.2s ease",
+              letterSpacing: "-0.01em",
+            }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.opacity = "0.9"; }}
+            onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+          >
+            {loading ? "Creation..." : "Creer mon compte"}
+          </button>
         </form>
-        <p className="text-sm mt-8" style={{ color: "#555" }}>Deja inscrit ? <Link to="/login" style={{ color: "#C6A15B" }}>Se connecter</Link></p>
+
+        <p style={{ marginTop: "24px", fontSize: "13px", color: "#2A2A2A", textAlign: "center" }}>
+          Deja inscrit ?{" "}
+          <Link to="/login" style={{ color: "#C6A15B", fontWeight: 600, textDecoration: "none" }}>
+            Se connecter
+          </Link>
+        </p>
       </div>
     </div>
   );
