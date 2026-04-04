@@ -81,7 +81,7 @@ export default function Login() {
             <div style={{ width: "20px", height: "1px", background: "#C6A15B" }} />
             <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#333" }}>Connexion</span>
           </div>
-          <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "32px", fontStyle: "italic", color: "white", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontStyle: "italic", color: "white", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
             Bon retour.
           </h1>
           <p style={{ marginTop: "8px", fontSize: "13px", color: "#333" }}>Connectez-vous a votre compte</p>

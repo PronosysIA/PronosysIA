@@ -18,7 +18,7 @@ function StatCard({ label, value, gold, delay }) {
     <div className="animate-fadeInUp" style={{ animationDelay: delay, background: "#0D0D0D", border: "1px solid #1A1A1A", borderRadius: "12px", padding: "20px 18px", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: 0, right: 0, width: "50px", height: "50px", background: "linear-gradient(225deg, rgba(198,161,91,0.06) 0%, transparent 65%)" }} />
       <p style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#555", marginBottom: "10px" }}>{label}</p>
-      <p style={{ fontSize: "28px", fontWeight: 800, color: gold ? "#C6A15B" : "white", lineHeight: 1, letterSpacing: "-0.02em", fontFamily: "'Space Grotesk', 'DM Sans', sans-serif" }}>{value}</p>
+      <p style={{ fontSize: "28px", fontWeight: 800, color: gold ? "#C6A15B" : "white", lineHeight: 1, letterSpacing: "-0.02em", fontFamily: "'Syne', 'Inter', sans-serif" }}>{value}</p>
       <div style={{ marginTop: "14px", height: "1px", background: gold ? "linear-gradient(90deg, #C6A15B60, transparent)" : "linear-gradient(90deg, #222, transparent)" }} />
     </div>
   );
@@ -49,7 +49,7 @@ function AnalysisCard({ title, desc, href, available, lockMsg, delay }) {
     >
       <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(198,161,91,0.3), transparent)", opacity: available ? 0.5 : 0 }} />
       <div style={{ position: "absolute", top: 0, right: 0, width: "80px", height: "80px", background: "linear-gradient(225deg, rgba(198,161,91,0.06), transparent 65%)" }} />
-      <h3 style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontSize: "20px", fontWeight: 700, color: "white", marginBottom: "10px", letterSpacing: "-0.02em" }}>{title}</h3>
+      <h3 style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontSize: "20px", fontWeight: 700, color: "white", marginBottom: "10px", letterSpacing: "-0.02em" }}>{title}</h3>
       <p style={{ fontSize: "13px", color: "#777", lineHeight: 1.65, marginBottom: "22px" }}>{desc}</p>
       {available ? (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#C6A15B", fontSize: "13px", fontWeight: 600 }}>
@@ -95,7 +95,7 @@ function ToolCard({ label, desc, href, icon, unlocked, comboOnly, delay }) {
           : <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         }
       </div>
-      <h3 style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "white", marginBottom: "6px", letterSpacing: "-0.01em" }}>{label}</h3>
+      <h3 style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontSize: "14px", fontWeight: 700, color: "white", marginBottom: "6px", letterSpacing: "-0.01em" }}>{label}</h3>
       <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.65, marginBottom: !unlocked ? "10px" : "0" }}>{desc}</p>
       {!unlocked && <p style={{ fontSize: "11px", color: "#C6A15B", fontWeight: 600 }}>{comboOnly ? "Combo Elite requis" : "Premium requis"}</p>}
     </div>
@@ -136,9 +136,9 @@ export default function Dashboard() {
       <div className="animate-fadeInUp" style={{ marginBottom: "40px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
           <div style={{ width: "32px", height: "2px", background: "linear-gradient(90deg, #C6A15B, rgba(198,161,91,0.3))", borderRadius: "1px" }} />
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#C6A15B", letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "'Space Grotesk', sans-serif" }}>PronosysIA</span>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "#C6A15B", letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "'Syne', sans-serif" }}>PronosysIA</span>
         </div>
-        <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: "clamp(30px, 5vw, 46px)", color: "white", fontStyle: "italic", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 5vw, 46px)", color: "white", fontStyle: "italic", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
           {user ? `Bonjour, ${user.name}.` : "Bienvenue."}
         </h1>
         <p style={{ marginTop: "10px", fontSize: "14px", color: "#777", lineHeight: 1.5 }}>
@@ -158,7 +158,7 @@ export default function Dashboard() {
       {!loading && stats.plan === "Gratuit" && (
         <div className="animate-fadeInUp delay-200" style={{ background: "rgba(198,161,91,0.04)", border: "1px solid rgba(198,161,91,0.12)", borderRadius: "14px", padding: "24px", marginBottom: "40px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, right: 0, width: "120px", height: "120px", background: "radial-gradient(circle at top right, rgba(198,161,91,0.08), transparent 70%)" }} />
-          <div style={{ fontSize: "10px", color: "#C6A15B", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "8px", fontFamily: "'Space Grotesk', sans-serif" }}>Passer a Premium</div>
+          <div style={{ fontSize: "10px", color: "#C6A15B", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "8px", fontFamily: "'Syne', sans-serif" }}>Passer a Premium</div>
           <h3 style={{ fontSize: "17px", fontWeight: 700, color: "white", marginBottom: "6px" }}>Debloquez tout PronosysIA</h3>
           <p style={{ fontSize: "13px", color: "#777", marginBottom: "18px" }}>Analyses illimitees, Generateur IA, Chatbot Video — a partir de 9,99€/mois.</p>
           <Link to="/dashboard/subscription" style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "#C6A15B", color: "white", padding: "10px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 700, textDecoration: "none" }}>

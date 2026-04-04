@@ -167,7 +167,7 @@ export default function DashboardLayout({ children }) {
               </svg>
             </div>
             <div>
-              <div style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white", lineHeight: 1.1 }}>
+              <div style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white", lineHeight: 1.1 }}>
                 Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
               </div>
               <div style={{ fontSize: "9px", color: theme.color, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "3px" }}>
@@ -266,7 +266,7 @@ export default function DashboardLayout({ children }) {
             >
               {Icons.menu}
             </button>
-            <div style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>
+            <div style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>
               Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
             </div>
             <div style={{ width: "36px" }} />

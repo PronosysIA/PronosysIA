@@ -31,7 +31,7 @@ export default function LandingPage() {
           <div style={{ width: "30px", height: "30px", background: "linear-gradient(135deg, rgba(198,161,91,0.15), rgba(198,161,91,0.05))", border: "1px solid rgba(198,161,91,0.25)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
-          <span style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontWeight: 800, fontSize: "16px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
+          <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "16px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
           <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#555" }}>{t("nav_features")}</a>
@@ -55,12 +55,12 @@ export default function LandingPage() {
         {/* Badge */}
         <div className="animate-fadeInUp" style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}>
           <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C6A15B", boxShadow: "0 0 8px rgba(198,161,91,0.6)" }} className="animate-pulse-gold" />
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#C6A15B" }}>{t("hero_badge")}</span>
+          <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#C6A15B" }}>{t("hero_badge")}</span>
           <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(198,161,91,0.3), transparent)", maxWidth: "120px" }} />
         </div>
 
         {/* Title */}
-        <h1 className="animate-fadeInUp delay-100" style={{ fontFamily: "'Instrument Serif', serif", fontSize: "clamp(44px, 7vw, 88px)", color: "white", fontStyle: "italic", lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: "24px", maxWidth: "900px" }}>
+        <h1 className="animate-fadeInUp delay-100" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(44px, 7vw, 88px)", color: "white", fontStyle: "italic", lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: "24px", maxWidth: "900px" }}>
           {t("hero_title_1")}<br />
           <span style={{ color: "rgba(255,255,255,0.85)" }}>{t("hero_title_2")}</span>
         </h1>
@@ -76,7 +76,7 @@ export default function LandingPage() {
         </p>
 
         <div className="animate-fadeInUp delay-400" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
-          <Link to={user ? "/dashboard" : "/register"} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#C6A15B", color: "white", padding: "14px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: 700, textDecoration: "none", fontFamily: "'Space Grotesk', sans-serif", transition: "all 0.2s ease" }}
+          <Link to={user ? "/dashboard" : "/register"} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#C6A15B", color: "white", padding: "14px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: 700, textDecoration: "none", fontFamily: "'Syne', sans-serif", transition: "all 0.2s ease" }}
             onMouseEnter={e => { e.currentTarget.style.background = "#A8864A"; e.currentTarget.style.transform = "translateY(-2px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#C6A15B"; e.currentTarget.style.transform = "none"; }}
           >
@@ -99,7 +99,7 @@ export default function LandingPage() {
             { value: 90, suffix: "%", label: t("stat_accuracy") },
           ].map((s, i) => (
             <div key={i} style={{ padding: "28px 20px", textAlign: "center", borderRight: i < 3 ? "1px solid #1A1A1A" : "none" }}>
-              <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(28px, 4vw, 36px)", fontWeight: 800, color: "white", marginBottom: "6px", letterSpacing: "-0.03em" }}><Counter end={s.value} suffix={s.suffix} /></p>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(28px, 4vw, 36px)", fontWeight: 800, color: "white", marginBottom: "6px", letterSpacing: "-0.03em" }}><Counter end={s.value} suffix={s.suffix} /></p>
               <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "#555" }}>{s.label}</p>
             </div>
           ))}
@@ -260,7 +260,7 @@ export default function LandingPage() {
       <footer className="relative z-10 px-8 py-12 max-w-6xl mx-auto" style={{ borderTop: "1px solid #1C1C1C" }}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            <span style={{ fontFamily: "'Space Grotesk', 'DM Sans', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
+            <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
             <span className="text-xs" style={{ color: "#444" }}>{t("footer_tagline")}</span>
           </div>
           <div className="flex items-center gap-8">
