@@ -354,7 +354,7 @@ def get_feedback(analysis_id: int, user: User = Depends(require_user)):
 
 
 @app.post("/api/stripe/create-checkout")
-def stripe_create_checkout(request_data: dict, user: User = Depends(require_user)):
+def stripe_create_checkout(request: Request, request_data: dict, user: User = Depends(require_user)):
     plan_type = request_data.get("plan_type")
     billing = request_data.get("billing", "monthly")
     if plan_type not in ("pubs", "reseaux", "combo", "individual"):
@@ -365,7 +365,8 @@ def stripe_create_checkout(request_data: dict, user: User = Depends(require_user
         raise HTTPException(status_code=400, detail="Configuration de prix manquante.")
     try:
         mode = "payment" if plan_type == "individual" else "subscription"
-        frontend = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        origin = request.headers.get("origin", "")
+        frontend = origin if origin and origin.startswith("http") else os.getenv("FRONTEND_URL", "https://pronosysia.vercel.app")
         session = stripe.checkout.Session.create(
             mode=mode, payment_method_types=["card"], customer_email=user.email,
             line_items=[{"price": price_id, "quantity": 1}],
@@ -380,11 +381,12 @@ def stripe_create_checkout(request_data: dict, user: User = Depends(require_user
         raise HTTPException(status_code=500, detail="Erreur paiement.")
 
 @app.post("/api/stripe/customer-portal")
-def stripe_customer_portal(user: User = Depends(require_user)):
+def stripe_customer_portal(request: Request, user: User = Depends(require_user)):
     if not user.stripe_customer_id:
         raise HTTPException(status_code=400, detail="Aucun abonnement.")
     try:
-        frontend = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        origin = request.headers.get("origin", "")
+        frontend = origin if origin and origin.startswith("http") else os.getenv("FRONTEND_URL", "https://pronosysia.vercel.app")
         session = stripe.billing_portal.Session.create(customer=user.stripe_customer_id, return_url=frontend + "/dashboard/subscription")
         return {"portal_url": session.url}
     except Exception:

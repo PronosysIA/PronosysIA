@@ -82,7 +82,7 @@ export default function Register() {
             <div style={{ width: "20px", height: "1px", background: "#C6A15B" }} />
             <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#333" }}>Inscription</span>
           </div>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "32px", fontStyle: "italic", color: "white", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+          <h1 style={{ fontFamily: "'Palatino Linotype', 'Palatino', Georgia, serif", fontSize: "32px", fontStyle: "italic", color: "white", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
             Creer un compte.
           </h1>
           <p style={{ marginTop: "8px", fontSize: "13px", color: "#333" }}>3 analyses gratuites — Sans CB</p>

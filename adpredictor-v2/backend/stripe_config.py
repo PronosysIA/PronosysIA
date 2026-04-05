@@ -74,28 +74,21 @@ def get_available_prices(plan_type: str, billing: str) -> str:
     return PRICE_IDS.get(key, "")
 
 
-def create_checkout_session(user_id: int, user_email: str, plan_type: str, billing: str) -> str:
+def create_checkout_session(user_id: int, user_email: str, plan_type: str, billing: str, frontend_url: str = "") -> str:
     """Cree une session Stripe Checkout et retourne l'URL."""
+    base = frontend_url.rstrip("/") if frontend_url else os.getenv("FRONTEND_URL", "https://pronosysia.vercel.app")
 
     if plan_type == "individual":
-        # Paiement unique pour 2 analyses
         session = stripe.checkout.Session.create(
             mode="payment",
             payment_method_types=["card"],
             customer_email=user_email,
-            line_items=[{
-                "price": PRICE_IDS["individual"],
-                "quantity": 1,
-            }],
-            metadata={
-                "user_id": str(user_id),
-                "plan_type": "individual",
-            },
-            success_url="http://localhost:5173/dashboard?payment=success",
-            cancel_url="http://localhost:5173/dashboard/subscription?payment=cancel",
+            line_items=[{"price": PRICE_IDS["individual"], "quantity": 1}],
+            metadata={"user_id": str(user_id), "plan_type": "individual"},
+            success_url=f"{base}/dashboard?payment=success",
+            cancel_url=f"{base}/dashboard/subscription?payment=cancel",
         )
     else:
-        # Abonnement recurrent
         price_id = get_available_prices(plan_type, billing)
         if not price_id:
             raise ValueError(f"Prix introuvable pour {plan_type}/{billing}")
@@ -104,27 +97,25 @@ def create_checkout_session(user_id: int, user_email: str, plan_type: str, billi
             mode="subscription",
             payment_method_types=["card"],
             customer_email=user_email,
-            line_items=[{
-                "price": price_id,
-                "quantity": 1,
-            }],
+            line_items=[{"price": price_id, "quantity": 1}],
             metadata={
                 "user_id": str(user_id),
                 "plan_type": plan_type,
                 "billing": billing,
                 "is_launch": str(LAUNCH_OFFER_ACTIVE),
             },
-            success_url="http://localhost:5173/dashboard?payment=success",
-            cancel_url="http://localhost:5173/dashboard/subscription?payment=cancel",
+            success_url=f"{base}/dashboard?payment=success",
+            cancel_url=f"{base}/dashboard/subscription?payment=cancel",
         )
 
     return session.url
 
 
-def create_customer_portal_session(stripe_customer_id: str) -> str:
+def create_customer_portal_session(stripe_customer_id: str, frontend_url: str = "") -> str:
     """Cree une session de portail client Stripe pour gerer l'abonnement."""
+    base = frontend_url.rstrip("/") if frontend_url else os.getenv("FRONTEND_URL", "https://pronosysia.vercel.app")
     session = stripe.billing_portal.Session.create(
         customer=stripe_customer_id,
-        return_url="http://localhost:5173/dashboard/subscription",
+        return_url=f"{base}/dashboard/subscription",
     )
     return session.url

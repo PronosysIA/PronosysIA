@@ -138,7 +138,7 @@ export default function Dashboard() {
           <div style={{ width: "32px", height: "2px", background: "linear-gradient(90deg, #C6A15B, rgba(198,161,91,0.3))", borderRadius: "1px" }} />
           <span style={{ fontSize: "10px", fontWeight: 700, color: "#C6A15B", letterSpacing: "0.22em", textTransform: "uppercase", fontFamily: "'Syne', sans-serif" }}>PronosysIA</span>
         </div>
-        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(30px, 5vw, 46px)", color: "white", fontStyle: "italic", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
+        <h1 style={{ fontFamily: "'Palatino Linotype', 'Palatino', Georgia, serif", fontSize: "clamp(30px, 5vw, 46px)", color: "white", fontStyle: "italic", lineHeight: 1.15, letterSpacing: "-0.02em" }}>
           {user ? `Bonjour, ${user.name}.` : "Bienvenue."}
         </h1>
         <p style={{ marginTop: "10px", fontSize: "14px", color: "#777", lineHeight: 1.5 }}>

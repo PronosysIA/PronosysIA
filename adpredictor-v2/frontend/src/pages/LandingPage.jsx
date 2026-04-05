@@ -34,14 +34,14 @@ export default function LandingPage() {
           <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "16px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
         </Link>
         <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#555" }}>{t("nav_features")}</a>
-          <a href="#process" className="text-sm transition-colors hover:text-white" style={{ color: "#555" }}>{t("nav_process")}</a>
-          <a href="#pricing" className="text-sm transition-colors hover:text-white" style={{ color: "#555" }}>{t("nav_pricing")}</a>
+          <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_features")}</a>
+          <a href="#process" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_process")}</a>
+          <a href="#pricing" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_pricing")}</a>
         </div>
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
           {user ? <Link to="/dashboard" className="btn-primary">{t("nav_dashboard")}</Link> : <>
-            <Link to="/login" className="text-sm px-4 py-2 transition-colors hover:text-white" style={{ color: "#555" }}>{t("nav_login")}</Link>
+            <Link to="/login" className="text-sm px-4 py-2 transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_login")}</Link>
             <Link to="/register" className="btn-primary">{t("nav_start")}</Link>
           </>}
         </div>
@@ -60,7 +60,7 @@ export default function LandingPage() {
         </div>
 
         {/* Title */}
-        <h1 className="animate-fadeInUp delay-100" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "clamp(44px, 7vw, 88px)", color: "white", fontStyle: "italic", lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: "24px", maxWidth: "900px" }}>
+        <h1 className="animate-fadeInUp delay-100" style={{ fontFamily: "'Palatino Linotype', 'Palatino', Georgia, serif", fontSize: "clamp(44px, 7vw, 88px)", color: "white", fontStyle: "italic", lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: "24px", maxWidth: "900px" }}>
           {t("hero_title_1")}<br />
           <span style={{ color: "rgba(255,255,255,0.85)" }}>{t("hero_title_2")}</span>
         </h1>
@@ -71,7 +71,7 @@ export default function LandingPage() {
           <div style={{ width: "8px", height: "8px", background: "transparent", border: "1px solid #C6A15B", transform: "rotate(45deg)" }} />
         </div>
 
-        <p className="animate-fadeInUp delay-300" style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "#888", lineHeight: 1.7, marginBottom: "48px", maxWidth: "540px" }}>
+        <p className="animate-fadeInUp delay-300" style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "#C0C0C0", lineHeight: 1.7, marginBottom: "48px", maxWidth: "540px" }}>
           {t("hero_desc")}
         </p>
 
@@ -83,7 +83,7 @@ export default function LandingPage() {
             {user ? t("hero_cta_logged") : t("hero_cta")}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </Link>
-          <span style={{ fontSize: "13px", color: "#555" }}>{t("hero_no_card")}</span>
+          <span style={{ fontSize: "13px", color: "#999" }}>{t("hero_no_card")}</span>
         </div>
       </section>
 
@@ -100,7 +100,7 @@ export default function LandingPage() {
           ].map((s, i) => (
             <div key={i} style={{ padding: "28px 20px", textAlign: "center", borderRight: i < 3 ? "1px solid #1A1A1A" : "none" }}>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(28px, 4vw, 36px)", fontWeight: 800, color: "white", marginBottom: "6px", letterSpacing: "-0.03em" }}><Counter end={s.value} suffix={s.suffix} /></p>
-              <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "#555" }}>{s.label}</p>
+              <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "#AAA" }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -128,11 +128,11 @@ export default function LandingPage() {
             <div key={i} className="p-8 md:p-10 group animate-fadeInUp relative overflow-hidden" style={{ background: "#0A0A0A" }}>
               <div className="absolute top-0 left-0 w-full h-px" style={{ background: "linear-gradient(90deg, transparent, " + f.accent + "20, transparent)" }} />
               <div className="flex items-start justify-between mb-8">
-                <span className="text-4xl font-display italic font-bold" style={{ color: "#1C1C1C" }}>{f.number}</span>
+                <span className="text-4xl font-display italic font-bold" style={{ color: "#3A3A3A" }}>{f.number}</span>
                 <div className="w-2 h-2 rounded-full mt-3 group-hover:scale-150 transition-transform" style={{ background: f.accent }} />
               </div>
               <h3 className="text-white font-medium text-lg mb-3 group-hover:translate-x-1 transition-transform">{f.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#555" }}>{f.desc}</p>
+              <p className="text-sm leading-relaxed" style={{ color: "#AAA" }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -156,11 +156,11 @@ export default function LandingPage() {
           ].map((s, i) => (
             <div key={i} className="animate-fadeInUp group" style={{ animationDelay: `${i * 150}ms` }}>
               <div className="mb-6">
-                <span className="text-6xl font-display italic font-bold transition-colors group-hover:text-white" style={{ color: "#1C1C1C" }}>{s.step}</span>
+                <span className="text-6xl font-display italic font-bold transition-colors group-hover:text-white" style={{ color: "#444" }}>{s.step}</span>
               </div>
               <h3 className="text-white text-xl font-medium mb-3">{s.title}</h3>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "#888" }}>{s.desc}</p>
-              <p className="text-xs leading-relaxed" style={{ color: "#333" }}>{s.detail}</p>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: "#C0C0C0" }}>{s.desc}</p>
+              <p className="text-xs leading-relaxed" style={{ color: "#999" }}>{s.detail}</p>
             </div>
           ))}
         </div>
@@ -173,7 +173,7 @@ export default function LandingPage() {
             <div className="p-12 md:p-16 flex flex-col justify-center">
               <p className="text-[11px] uppercase tracking-widest mb-6" style={{ color: "#C6A15B" }}>{t("showcase_label")}</p>
               <h3 className="font-display text-3xl italic text-white mb-4">{t("showcase_title")}</h3>
-              <p className="text-sm leading-relaxed mb-8" style={{ color: "#555" }}>{t("showcase_desc")}</p>
+              <p className="text-sm leading-relaxed mb-8" style={{ color: "#B0B0B0" }}>{t("showcase_desc")}</p>
               <Link to={user ? "/dashboard/chatbot" : "/register"} className="btn-gold w-fit">{t("showcase_cta")}</Link>
             </div>
             <div className="p-8 flex items-center justify-center" style={{ background: "#0E0E0E" }}>
@@ -197,7 +197,7 @@ export default function LandingPage() {
           <blockquote className="font-display text-2xl md:text-3xl italic text-white leading-snug mb-8 max-w-2xl mx-auto">
             "{t("testimonial_quote")}"
           </blockquote>
-          <p className="text-sm" style={{ color: "#555" }}>— {t("testimonial_author")}</p>
+          <p className="text-sm" style={{ color: "#999" }}>— {t("testimonial_author")}</p>
         </div>
       </section>
 
@@ -207,7 +207,7 @@ export default function LandingPage() {
         <div className="text-center mb-20">
           <p className="text-[11px] uppercase tracking-widest mb-4 animate-fadeInUp" style={{ color: "#C6A15B" }}>{t("pricing_label")}</p>
           <h2 className="font-display text-4xl md:text-5xl italic text-white animate-fadeInUp delay-100">{t("pricing_title")}</h2>
-          <p className="text-base mt-4 animate-fadeInUp delay-200" style={{ color: "#555" }}>{t("pricing_desc")}</p>
+          <p className="text-base mt-4 animate-fadeInUp delay-200" style={{ color: "#B0B0B0" }}>{t("pricing_desc")}</p>
         </div>
 
         <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 stagger-children">
@@ -222,7 +222,7 @@ export default function LandingPage() {
               {p.popular && <div className="text-center py-2 text-[10px] font-semibold tracking-widest uppercase text-white" style={{ background: "#C6A15B", borderRadius: "1rem 1rem 0 0" }}>{t("pricing_popular")}</div>}
               <div className="p-6">
                 <h3 className="text-white font-medium mb-3 text-sm">{p.title}</h3>
-                <div className="mb-6"><span className="text-3xl font-display italic text-white">{p.price}</span><span className="text-xs ml-1" style={{ color: "#555" }}>{p.note}</span></div>
+                <div className="mb-6"><span className="text-3xl font-display italic text-white">{p.price}</span><span className="text-xs ml-1" style={{ color: "#999" }}>{p.note}</span></div>
                 <ul className="space-y-2.5 mb-6">{p.features.map((f, j) => <li key={j} className="flex items-start gap-2 text-xs" style={{ color: "#888" }}><span style={{ color: "#C6A15B" }} className="mt-0.5"><Check /></span>{f}</li>)}</ul>
                 {p.enterprise ? (
                   <a href="mailto:PronosysIA.Help@outlook.com?subject=Demande%20devis%20Entreprise%20PronosysIA" className="block text-center py-2.5 rounded-lg text-xs font-semibold transition-all hover:-translate-y-1 text-white border" style={{ borderColor: "#333" }}>{t("pricing_contact")}</a>
@@ -237,7 +237,7 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <p className="text-center text-sm mt-10 animate-fadeInUp delay-500" style={{ color: "#333" }}>{t("pricing_footer")}</p>
+        <p className="text-center text-sm mt-10 animate-fadeInUp delay-500" style={{ color: "#888" }}>{t("pricing_footer")}</p>
       </section>
 
       {/* ===== CTA FINAL ===== */}
@@ -248,7 +248,7 @@ export default function LandingPage() {
 
           <div className="relative z-10">
             <h2 className="font-display text-4xl md:text-5xl italic text-white mb-6">{t("cta_title")}</h2>
-            <p className="text-base mb-12 max-w-md mx-auto" style={{ color: "#555" }}>{t("cta_desc")}</p>
+            <p className="text-base mb-12 max-w-md mx-auto" style={{ color: "#B0B0B0" }}>{t("cta_desc")}</p>
             <Link to={user ? "/dashboard" : "/register"} className="btn-gold px-12 py-4 text-base inline-flex items-center gap-3">
               {t("cta_button")} <Arrow />
             </Link>
@@ -261,16 +261,16 @@ export default function LandingPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
-            <span className="text-xs" style={{ color: "#444" }}>{t("footer_tagline")}</span>
+            <span className="text-xs" style={{ color: "#888" }}>{t("footer_tagline")}</span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#features" className="text-xs transition-colors hover:text-white" style={{ color: "#333" }}>{t("nav_features")}</a>
-            <a href="#pricing" className="text-xs transition-colors hover:text-white" style={{ color: "#333" }}>{t("nav_pricing")}</a>
-            <Link to="/login" className="text-xs transition-colors hover:text-white" style={{ color: "#333" }}>{t("nav_login")}</Link>
+            <a href="#features" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_features")}</a>
+            <a href="#pricing" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_pricing")}</a>
+            <Link to="/login" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_login")}</Link>
           </div>
         </div>
         <div className="mt-8 pt-8" style={{ borderTop: "1px solid #141414" }}>
-          <p className="text-xs text-center" style={{ color: "#222" }}>&copy; 2026 PronosysIA. {t("footer_copyright")}</p>
+          <p className="text-xs text-center" style={{ color: "#666" }}>&copy; 2026 PronosysIA. {t("footer_copyright")}</p>
         </div>
       </footer>
     </div>
