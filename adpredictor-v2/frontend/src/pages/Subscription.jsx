@@ -8,19 +8,40 @@ export default function Subscription() {
   const [billing, setBilling] = useState("monthly");
   const [sub, setSub] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stripeLoading, setStripeLoading] = useState(null);
+  const [stripeError, setStripeError] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => { fetch("/api/subscription", { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(d => setSub(d)).finally(() => setLoading(false)); }, []);
 
   const subscribe = async (plan) => {
+    setStripeLoading(plan);
+    setStripeError("");
     try {
-      const res = await fetch("/api/stripe/create-checkout", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ plan_type: plan, billing }) });
-      const d = await res.json(); if (d.checkout_url) window.location.href = d.checkout_url;
-    } catch { alert("Erreur."); }
+      const res = await fetch("/api/stripe/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan_type: plan, billing }),
+      });
+      const d = await res.json();
+      if (d.checkout_url) {
+        window.location.href = d.checkout_url;
+      } else {
+        setStripeError(d.detail || "Impossible de lancer le paiement. Verifie ta connexion.");
+      }
+    } catch {
+      setStripeError("Erreur de connexion au serveur de paiement.");
+    } finally {
+      setStripeLoading(null);
+    }
   };
 
   const portal = async () => {
-    try { const res = await fetch("/api/stripe/customer-portal", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }); const d = await res.json(); if (d.portal_url) window.location.href = d.portal_url; } catch {}
+    try {
+      const res = await fetch("/api/stripe/customer-portal", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } });
+      const d = await res.json();
+      if (d.portal_url) window.location.href = d.portal_url;
+    } catch {}
   };
 
   if (loading) return <DashboardLayout><div className="flex justify-center py-20"><div className="w-10 h-10 rounded-full border-2 animate-spin" style={{ borderColor: "#1C1C1C", borderTopColor: "#C6A15B" }} /></div></DashboardLayout>;
@@ -85,6 +106,12 @@ export default function Subscription() {
         <h1 className="font-display text-4xl italic text-white mb-3">Abonnement.</h1>
       </div>
 
+      {stripeError && (
+        <div className="card px-5 py-4 mb-8 animate-fadeInUp" style={{ borderColor: "rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.05)" }}>
+          <p className="text-sm" style={{ color: "#F87171" }}>⚠ {stripeError}</p>
+        </div>
+      )}
+
       {sub && sub.plan !== "free" && (
         <div className="card-gold p-6 mb-10 animate-fadeInUp">
           <p className="text-sm" style={{ color: "#C6A15B" }}>
@@ -136,8 +163,10 @@ export default function Subscription() {
                 {isCurrent ? (
                   <div className="text-center py-3 rounded-lg text-sm" style={{ background: "rgba(198,161,91,0.06)", color: "#C6A15B", border: "1px solid rgba(198,161,91,0.15)" }}>Plan actuel</div>
                 ) : p.type ? (
-                  <button onClick={() => subscribe(p.type)} className={`w-full py-3 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5 ${p.popular ? "text-white" : "text-white border"}`}
-                    style={p.popular ? { background: "#C6A15B" } : { borderColor: "#333" }}>Choisir</button>
+                  <button onClick={() => subscribe(p.type)} disabled={stripeLoading === p.type} className={`w-full py-3 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5 ${p.popular ? "text-white" : "text-white border"}`}
+                    style={p.popular ? { background: stripeLoading === p.type ? "#A8864A" : "#C6A15B", opacity: stripeLoading ? 0.8 : 1 } : { borderColor: "#333", opacity: stripeLoading ? 0.8 : 1 }}>
+                    {stripeLoading === p.type ? "Chargement..." : "Choisir"}
+                  </button>
                 ) : null}
               </div>
             </div>
@@ -148,7 +177,9 @@ export default function Subscription() {
       <div className="card p-8 text-center mt-10 animate-fadeInUp delay-400">
         <p className="text-white font-medium mb-1">Sans abonnement</p>
         <p className="text-sm mb-4" style={{ color: "#555" }}>Pack 2 analyses a 5€ — Paiement unique</p>
-        <button onClick={() => subscribe("individual")} className="btn-outline">Acheter — 5€</button>
+        <button onClick={() => subscribe("individual")} disabled={stripeLoading === "individual"} className="btn-outline">
+          {stripeLoading === "individual" ? "Chargement..." : "Acheter — 5€"}
+        </button>
       </div>
 
       {sub?.stripe_customer_id && <div className="text-center mt-6"><button onClick={portal} className="text-sm" style={{ color: "#C6A15B" }}>Gerer mon abonnement →</button></div>}

@@ -355,6 +355,8 @@ def get_feedback(analysis_id: int, user: User = Depends(require_user)):
 
 @app.post("/api/stripe/create-checkout")
 def stripe_create_checkout(request: Request, request_data: dict, user: User = Depends(require_user)):
+    if not stripe.api_key:
+        raise HTTPException(status_code=503, detail="Paiement non configure (cle Stripe manquante).")
     plan_type = request_data.get("plan_type")
     billing = request_data.get("billing", "monthly")
     if plan_type not in ("pubs", "reseaux", "combo", "individual"):
@@ -376,9 +378,14 @@ def stripe_create_checkout(request: Request, request_data: dict, user: User = De
             allow_promotion_codes=True,
         )
         return {"checkout_url": session.url}
+    except stripe.error.AuthenticationError:
+        raise HTTPException(status_code=503, detail="Cle Stripe invalide. Contacte le support.")
+    except stripe.error.InvalidRequestError as e:
+        print("Stripe InvalidRequest: " + str(e))
+        raise HTTPException(status_code=400, detail="Erreur de configuration Stripe.")
     except Exception as e:
         print("Erreur Stripe: " + str(e))
-        raise HTTPException(status_code=500, detail="Erreur paiement.")
+        raise HTTPException(status_code=500, detail="Erreur paiement: " + str(e)[:120])
 
 @app.post("/api/stripe/customer-portal")
 def stripe_customer_portal(request: Request, user: User = Depends(require_user)):
