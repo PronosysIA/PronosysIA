@@ -11,6 +11,30 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY and not ANTHROPIC_API_KEY.startswith("sk-ant-placeholder") else None
 
 
+def normalize_boost_result(result: dict, platform_name: str) -> dict:
+    actions = result.get("post_publication_actions") if isinstance(result.get("post_publication_actions"), list) else []
+    result["strategy_overview"] = result.get("strategy_overview") or (
+        f"Plan de diffusion concu pour {platform_name}: publiez sur les creneaux forts, soutenez la premiere heure et reutilisez rapidement les meilleurs angles."
+    )
+    result["priority_checklist"] = result.get("priority_checklist") if isinstance(result.get("priority_checklist"), list) and result.get("priority_checklist") else [
+        "Validez un hook lisible des la miniature et la premiere seconde.",
+        "Preparez la caption et le premier commentaire avant de publier.",
+        "Bloquez 30 a 60 minutes pour repondre rapidement aux premieres interactions.",
+    ]
+    result["first_hour_plan"] = result.get("first_hour_plan") if isinstance(result.get("first_hour_plan"), list) and result.get("first_hour_plan") else actions[:3]
+    result["repurpose_angles"] = result.get("repurpose_angles") if isinstance(result.get("repurpose_angles"), list) and result.get("repurpose_angles") else [
+        "Version plus courte centree uniquement sur le hook.",
+        "Version preuve/resultat avec sous-titres plus denses.",
+        "Version commentaire/reponse pour relancer l'algorithme.",
+    ]
+    result["distribution_risks"] = result.get("distribution_risks") if isinstance(result.get("distribution_risks"), list) and result.get("distribution_risks") else [
+        "Evitez de publier sans disponibilite pour animer la premiere heure.",
+        "Trop de hashtags generiques peuvent diluer le positionnement.",
+        "Un cross-post identique partout sans adaptation peut reduire la performance.",
+    ]
+    return result
+
+
 def generate_boost_strategy(category, platform, file_path, filename, preferred_days=None):
     """Genere une strategie de publication optimale."""
 
@@ -23,7 +47,7 @@ def generate_boost_strategy(category, platform, file_path, filename, preferred_d
     if preferred_days:
         days_context = "\nLe client prefere publier les jours suivants: " + ", ".join(preferred_days)
 
-    prompt = """Tu es un EXPERT en strategie de publication sur les reseaux sociaux et en growth hacking. Tu dois generer la STRATEGIE DE PUBLICATION OPTIMALE pour maximiser les vues et l'engagement de cette video.
+    prompt = """Tu es un EXPERT en strategie de publication sur les reseaux sociaux et en growth marketing. Tu dois generer la STRATEGIE DE PUBLICATION OPTIMALE pour maximiser les vues et l'engagement de cette video.
 
 INFORMATIONS:
 - Plateforme: """ + platform_name + """
@@ -34,13 +58,15 @@ INFORMATIONS:
 - Fuseau horaire: Europe/Paris (France)""" + days_context + """
 
 GENERE:
-1. Les 3 MEILLEURS creneaux horaires pour publier cette semaine (jour + heure precise)
-2. 20-30 hashtags optimaux (mix trending + niche + moyen volume)
-3. 3 versions de description/caption optimisees
-4. La strategie de son/musique trending a utiliser
-5. Les parametres de publication recommandes
-6. Un plan de republication/cross-posting
-7. Des actions post-publication pour booster l'engagement
+1. Une lecture rapide de la strategie
+2. Les 3 meilleurs creneaux horaires pour publier cette semaine (jour + heure precise)
+3. 20-30 hashtags optimaux (mix trending + niche + moyen volume)
+4. 3 versions de description/caption optimisees
+5. La strategie de son/musique trending a utiliser
+6. Les parametres de publication recommandes
+7. Un plan de republication/cross-posting
+8. Des actions post-publication pour booster l'engagement
+9. Une checklist simple et un plan de premiere heure
 
 SOURCES pour les creneaux horaires (etudes Later, Hootsuite, Sprout Social 2024-2025):
 - TikTok France: Mardi/Jeudi 18h-20h, Vendredi 19h-21h, Samedi 10h-12h
@@ -49,14 +75,16 @@ SOURCES pour les creneaux horaires (etudes Later, Hootsuite, Sprout Social 2024-
 - Snapchat: Mercredi/Samedi 20h-23h
 
 REGLES STRICTES:
-- Les expected_boost doivent etre REALISTES: entre +15% et +45% maximum (pas de +200% ou +300%)
-- Base les hashtags sur de VRAIS hashtags qui existent et sont utilises en """ + str(now.year) + """
-- Les captions doivent etre adaptees au CONTENU REEL de la video (regarde les frames)
-- Sois honnete: si tu n'es pas sur d'une donnee, dis-le
+- Les expected_boost doivent etre REALISTES: entre +15% et +45% maximum
+- Base les hashtags sur de vrais hashtags qui existent et sont utilises en """ + str(now.year) + """
+- Les captions doivent etre adaptees au contenu reel de la video
+- Reste precis mais facile a executer
 - Ajoute "source": "Etude Later/Hootsuite 2024-2025" dans chaque optimal_slot
 
-Reponds UNIQUEMENT en JSON valide (pas de texte avant ou apres):
+Reponds UNIQUEMENT en JSON valide:
 {
+  "strategy_overview": "<resume clair de la strategie en 2 phrases>",
+  "priority_checklist": ["<action prioritaire>"],
   "optimal_slots": [
     {
       "day": "<jour de la semaine>",
@@ -77,16 +105,6 @@ Reponds UNIQUEMENT en JSON valide (pas de texte avant ou apres):
     {
       "version": "Hook emotionnel",
       "text": "<caption complete avec emojis>",
-      "why": "<pourquoi>"
-    },
-    {
-      "version": "Question engageante",
-      "text": "<caption complete>",
-      "why": "<pourquoi>"
-    },
-    {
-      "version": "Storytelling",
-      "text": "<caption complete>",
       "why": "<pourquoi>"
     }
   ],
@@ -115,6 +133,15 @@ Reponds UNIQUEMENT en JSON valide (pas de texte avant ou apres):
       "impact": "<impact>"
     }
   ],
+  "first_hour_plan": [
+    {
+      "timing": "<quand>",
+      "action": "<action>",
+      "impact": "<impact>"
+    }
+  ],
+  "repurpose_angles": ["<idee de declinaison>"],
+  "distribution_risks": ["<risque a eviter>"],
   "weekly_plan": [
     {
       "day": "<jour>",
@@ -123,7 +150,7 @@ Reponds UNIQUEMENT en JSON valide (pas de texte avant ou apres):
   ]
 }
 
-Sois TRES PRECIS et CONCRET. Donne des heures exactes, des hashtags reels, des strategies actionnables."""
+Sois tres precis, concret et utile sans surcharger inutilement."""
 
     messages_content = []
     if frames:
@@ -146,7 +173,7 @@ Sois TRES PRECIS et CONCRET. Donne des heures exactes, des hashtags reels, des s
                 response_text = response_text[:-3]
             response_text = response_text.strip()
 
-        return json.loads(response_text)
+        return normalize_boost_result(json.loads(response_text), platform_name)
 
     except Exception as e:
         print("Erreur booster: " + str(e))
@@ -170,7 +197,7 @@ def generate_boost_fallback(platform, now):
             "source": "Etude Later/Hootsuite 2024-2025",
         })
 
-    return {
+    return normalize_boost_result({
         "optimal_slots": slots,
         "hashtags": {
             "trending": ["#fyp", "#viral", "#trending", "#pourtoi", "#foryou"],
@@ -179,34 +206,34 @@ def generate_boost_fallback(platform, now):
             "strategy": "Mix de 3-5 trending + 5-8 niche + 3-5 moyen volume. Total: 15-20 hashtags max.",
         },
         "captions": [
-            {"version": "Hook emotionnel", "text": "Cette technique a change ma vie... (et elle va changer la votre) \n\nSave ce post pour plus tard\n\n#fyp #viral", "why": "Cree de la curiosite et incite a sauvegarder"},
-            {"version": "Question engageante", "text": "Vous faites encore cette erreur ?\n\nCommentez OUI si vous voulez la solution", "why": "Genere des commentaires qui boostent l'algo"},
-            {"version": "Storytelling", "text": "Il y a 3 mois, je ne savais meme pas que c'etait possible...\n\nAujourd'hui, les resultats parlent d'eux-memes", "why": "Le storytelling cree une connexion emotionnelle"},
+            {"version": "Hook emotionnel", "text": "Cette technique a change ma vie... et elle peut changer la votre.\n\nSave ce post pour plus tard.\n\n#fyp #viral", "why": "Cree de la curiosite et incite a sauvegarder."},
+            {"version": "Question engageante", "text": "Vous faites encore cette erreur ?\n\nCommentez OUI si vous voulez la solution.", "why": "Genere des commentaires qui boostent l'algo."},
+            {"version": "Storytelling", "text": "Il y a 3 mois, je ne savais meme pas que c'etait possible...\n\nAujourd'hui, les resultats parlent d'eux-memes.", "why": "Le storytelling cree une connexion emotionnelle."},
         ],
         "sound_strategy": {
-            "recommendation": "Utilisez un son trending de la semaine",
-            "alternatives": ["Musique libre Epidemic Sound", "Son original avec voix off"],
-            "tip": "Verifiez les sons trending dans l'onglet Decouverte de l'app",
+            "recommendation": "Utilisez un son trending de la semaine coherent avec votre positionnement.",
+            "alternatives": ["Musique libre energique", "Son original avec voix off"],
+            "tip": "Verifiez les sons trending dans l'onglet Decouverte de l'app avant de publier.",
         },
         "publishing_settings": {
-            "cover_thumbnail": "Choisissez le frame le plus impactant comme miniature",
-            "first_comment": "Epinglez un commentaire avec un CTA ou une question",
-            "reply_strategy": "Repondez a CHAQUE commentaire dans la premiere heure",
-            "share_groups": "Partagez dans 2-3 groupes/communautes lies a votre niche",
+            "cover_thumbnail": "Choisissez le frame le plus impactant comme miniature.",
+            "first_comment": "Epinglez un commentaire avec une question ou un CTA.",
+            "reply_strategy": "Repondez a chaque commentaire dans la premiere heure.",
+            "share_groups": "Partagez dans 2 a 3 communautes liees a votre niche.",
         },
         "cross_posting_plan": [
-            {"platform": "Instagram Reels", "when": "24h apres la publication originale", "adaptation": "Meme video, ajustez les hashtags pour Instagram"},
-            {"platform": "YouTube Shorts", "when": "48h apres", "adaptation": "Ajoutez un titre accrocheur et une description SEO"},
+            {"platform": "Instagram Reels", "when": "24h apres la publication originale", "adaptation": "Meme idee, hashtags adaptes a Instagram et couverture plus propre."},
+            {"platform": "YouTube Shorts", "when": "48h apres", "adaptation": "Ajoutez un titre plus SEO et une description courte."},
         ],
         "post_publication_actions": [
-            {"timing": "0-15 min apres", "action": "Repondez aux premiers commentaires", "impact": "Signal fort pour l'algorithme"},
-            {"timing": "1h apres", "action": "Partagez en story avec un sondage", "impact": "Redirige du trafic vers la video"},
-            {"timing": "24h apres", "action": "Postez un commentaire Mise a jour ou repondez a un commentaire populaire", "impact": "Relance la video dans l'algorithme"},
+            {"timing": "0-15 min", "action": "Repondez aux premiers commentaires", "impact": "Signal fort pour l'algorithme"},
+            {"timing": "30-45 min", "action": "Relancez la diffusion via story ou message prive cible", "impact": "Genere un second pic d'attention"},
+            {"timing": "24h", "action": "Relancez avec un commentaire ou une story suivi", "impact": "Peut re-activer la video"},
         ],
         "weekly_plan": [
-            {"day": "Jour 1", "action": "Publication + engagement actif (1h)"},
+            {"day": "Jour 1", "action": "Publication + engagement actif pendant 1h"},
             {"day": "Jour 2", "action": "Cross-post sur Instagram Reels + story"},
             {"day": "Jour 3", "action": "Cross-post YouTube Shorts + interaction commentaires"},
-            {"day": "Jour 5", "action": "Analyser les stats et preparer la prochaine video"},
+            {"day": "Jour 5", "action": "Analyse des stats et preparation de la prochaine variation"},
         ],
-    }
+    }, platform_name)

@@ -1,49 +1,132 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation, LanguageSwitcher } from "../i18n/useLang.jsx";
-
-function useTheme() {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  return useMemo(() => {
-    if (!user) return { label: "FREE", color: "#444" };
-    if (user.is_admin) return { label: "ADMIN", color: "#C6A15B", emoji: "\u{1F451}" };
-    if (user.plan === "premium_combo") return { label: "COMBO ELITE", color: "#C6A15B", emoji: "\u{1F48E}" };
-    if (user.plan === "premium_reseaux") return { label: "CREATOR", color: "#C6A15B", emoji: "\u{1F525}" };
-    if (user.plan === "premium_pubs") return { label: "POWER", color: "#C6A15B", emoji: "\u26A1" };
-    return { label: "FREE", color: "#444" };
-  }, [user?.plan, user?.is_admin]);
-}
+import NotificationBanner from "./NotificationBanner.jsx";
 
 const Icons = {
-  grid: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>,
-  tv: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect width="20" height="15" x="2" y="7" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>,
-  phone: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>,
-  sparkle: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>,
-  rocket: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>,
-  chat: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-  bar: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>,
-  card: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>,
-  settings: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>,
-  logout: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
-  menu: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>,
+  dashboard: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <rect width="7" height="7" x="3" y="3" rx="1.4" />
+      <rect width="7" height="7" x="14" y="3" rx="1.4" />
+      <rect width="7" height="7" x="14" y="14" rx="1.4" />
+      <rect width="7" height="7" x="3" y="14" rx="1.4" />
+    </svg>
+  ),
+  ads: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <rect width="20" height="15" x="2" y="5" rx="2" />
+      <path d="M7 20v2M17 20v2M2 10h20" />
+    </svg>
+  ),
+  social: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <rect width="14" height="20" x="5" y="2" rx="2.5" />
+      <path d="M12 18h.01" />
+    </svg>
+  ),
+  generator: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" />
+    </svg>
+  ),
+  booster: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M5 19c-1.4 1.18-2 4-2 4s2.82-.6 4-2c.7-.83.63-2.04-.11-2.77C6.16 17.5 5.95 17.3 5 19z" />
+      <path d="M14 14l-4-4c.9-2.9 2.6-5.38 5.02-6.98C18.01 1.04 21 1 21 1s.04 2.99-1.02 5.98C18.38 9.4 15.9 11.1 13 12z" />
+    </svg>
+  ),
+  chatbot: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H9l-5 5V5z" />
+    </svg>
+  ),
+  history: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M12 8v5l3 2" />
+      <path d="M3.05 11A9 9 0 1 0 6 5.3" />
+      <path d="M3 4v5h5" />
+    </svg>
+  ),
+  billing: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <rect width="20" height="14" x="2" y="5" rx="2" />
+      <path d="M2 10h20" />
+    </svg>
+  ),
+  admin: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+      <path d="M3 12h2m14 0h2M12 3v2m0 14v2M5.6 5.6l1.4 1.4m10 10 1.4 1.4m0-12.8-1.4 1.4m-10 10-1.4 1.4" />
+    </svg>
+  ),
+  logout: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+      <path d="M10 17l5-5-5-5" />
+      <path d="M15 12H3" />
+      <path d="M20 19V5a2 2 0 0 0-2-2h-4" />
+    </svg>
+  ),
+  menu: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18" />
+    </svg>
+  ),
 };
+
+function getTheme(user) {
+  if (!user) return { label: "FREE", detail: "Starter access", accent: "#686158" };
+  if (user.is_admin) return { label: "ADMIN", detail: "Full control", accent: "#C6A15B" };
+  if (user.plan === "premium_combo") return { label: "COMBO ELITE", detail: "All systems unlocked", accent: "#C6A15B" };
+  if (user.plan === "premium_reseaux") return { label: "CREATOR", detail: "Social virality stack", accent: "#C6A15B" };
+  if (user.plan === "premium_pubs") return { label: "POWER", detail: "Ads performance stack", accent: "#C6A15B" };
+  if (user.plan === "individual") return { label: "PACK", detail: "Credit-based access", accent: "#C6A15B" };
+  return { label: "FREE", detail: "Starter access", accent: "#686158" };
+}
+
+function BrandMark() {
+  return (
+    <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(198,161,91,0.22), rgba(198,161,91,0.06))", border: "1px solid rgba(198,161,91,0.24)", boxShadow: "0 12px 28px rgba(0,0,0,0.28)" }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    </div>
+  );
+}
+
+function SidebarLink({ item, active, onClick }) {
+  return (
+    <Link
+      to={item.h}
+      onClick={onClick}
+      className="group flex items-center gap-3 px-3 py-3 rounded-2xl transition-all"
+      style={active ? { background: "linear-gradient(135deg, rgba(198,161,91,0.16), rgba(198,161,91,0.05))", border: "1px solid rgba(198,161,91,0.2)" } : { border: "1px solid transparent" }}
+    >
+      <span className="flex items-center justify-center w-9 h-9 rounded-xl transition-all" style={active ? { background: "rgba(198,161,91,0.16)", color: "#C6A15B" } : { background: "rgba(255,255,255,0.03)", color: "#7D7568" }}>
+        {Icons[item.icon]}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-semibold leading-none" style={{ color: active ? "#F6F0E5" : "#D2CAC0" }}>{item.l}</div>
+        {item.sub && <div className="text-[11px] mt-1 truncate" style={{ color: active ? "#B8AB93" : "#6F685D" }}>{item.sub}</div>}
+      </div>
+      {item.badge > 0 && (
+        <span className="min-w-[22px] h-[22px] px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center" style={{ background: "#C6A15B", color: "#120f0a" }}>
+          {item.badge}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export default function DashboardLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const token = localStorage.getItem("token");
+  const theme = getTheme(user);
   const [open, setOpen] = useState(false);
   const [scheduledCount, setScheduledCount] = useState(0);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  const theme = useTheme();
-  const token = localStorage.getItem("token");
-  const { t } = useTranslation();
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
+  const [isDesktop, setIsDesktop] = useState(typeof window !== "undefined" ? window.innerWidth >= 1024 : true);
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -53,248 +136,207 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (!token) return;
-    fetch("/api/scheduled-posts", { headers: { Authorization: "Bearer " + token } })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.posts) setScheduledCount(data.posts.filter(p => p.status !== "published").length);
+    fetch("/api/scheduled-posts", { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data?.posts) {
+          setScheduledCount(data.posts.filter((post) => post.status !== "published").length);
+        }
       })
       .catch(() => {});
   }, [token, location.pathname]);
 
-  useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
 
-  const isActive = (path) => path === "/dashboard"
-    ? location.pathname === "/dashboard"
-    : location.pathname.startsWith(path);
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
+  const isActive = (path) => path === "/dashboard" ? location.pathname === "/dashboard" : location.pathname.startsWith(path);
 
   const navGroups = [
     {
-      key: "analyse", label: t("sidebar_section_analyse"), items: [
-        { l: t("sidebar_dashboard"), h: "/dashboard", icon: "grid" },
-        { l: t("sidebar_pubs"), h: "/dashboard/pubs", icon: "tv" },
-        { l: t("sidebar_reseaux"), h: "/dashboard/reseaux", icon: "phone" },
-      ]
+      key: "analysis",
+      label: t("sidebar_section_analyse"),
+      items: [
+        { l: t("sidebar_dashboard"), h: "/dashboard", icon: "dashboard", sub: t("dash_tools_label") },
+        { l: t("sidebar_pubs"), h: "/dashboard/pubs", icon: "ads", sub: t("analyze_pubs_subdesc") },
+        { l: t("sidebar_reseaux"), h: "/dashboard/reseaux", icon: "social", sub: t("analyze_reseaux_subdesc") },
+      ],
     },
     {
-      key: "outils", label: t("sidebar_section_tools"), items: [
-        { l: t("sidebar_generator"), h: "/dashboard/generator", icon: "sparkle", premium: true },
-        { l: t("sidebar_booster"), h: "/dashboard/booster", icon: "rocket", premium: true, badge: scheduledCount },
-        { l: t("sidebar_chatbot"), h: "/dashboard/chatbot", icon: "chat", premium: true },
-      ]
+      key: "tools",
+      label: t("sidebar_section_tools"),
+      items: [
+        { l: t("sidebar_generator"), h: "/dashboard/generator", icon: "generator", sub: t("dash_tool_generator_desc") },
+        { l: t("sidebar_booster"), h: "/dashboard/booster", icon: "booster", sub: t("dash_tool_booster_desc"), badge: scheduledCount },
+        { l: t("sidebar_chatbot"), h: "/dashboard/chatbot", icon: "chatbot", sub: t("dash_tool_chatbot_desc") },
+      ],
     },
     {
-      key: "historique", label: t("sidebar_section_history"), items: [
-        { l: t("sidebar_analyses"), h: "/dashboard/analyses", icon: "bar" },
-        { l: t("sidebar_generations"), h: "/dashboard/generations", icon: "sparkle" },
-        { l: t("sidebar_conversations"), h: "/dashboard/chat-history", icon: "chat" },
-      ]
+      key: "history",
+      label: t("sidebar_section_history"),
+      items: [
+        { l: t("sidebar_analyses"), h: "/dashboard/analyses", icon: "history", sub: t("history_analyses_desc") },
+        { l: t("sidebar_generations"), h: "/dashboard/generations", icon: "generator", sub: t("history_gens_desc") },
+        { l: t("sidebar_conversations"), h: "/dashboard/chat-history", icon: "chatbot", sub: t("history_chats_desc") },
+      ],
     },
     {
-      key: "compte", label: t("sidebar_section_account"), items: [
-        { l: t("sidebar_subscription"), h: "/dashboard/subscription", icon: "card" },
-        ...(user?.is_admin ? [{ l: t("sidebar_admin"), h: "/dashboard/admin", icon: "settings" }] : []),
-      ]
+      key: "account",
+      label: t("sidebar_section_account"),
+      items: [
+        { l: t("sidebar_subscription"), h: "/dashboard/subscription", icon: "billing", sub: t("sub_desc") },
+        ...(user?.is_admin ? [{ l: t("sidebar_admin"), h: "/dashboard/admin", icon: "admin", sub: t("admin_platform_management") }] : []),
+      ],
     },
   ];
 
-  const bottomTabs = [
-    { l: "Home", h: "/dashboard", icon: "grid" },
-    { l: "Pubs", h: "/dashboard/pubs", icon: "tv" },
-    { l: "Outils", h: "/dashboard/generator", icon: "sparkle" },
-    { l: "Historique", h: "/dashboard/analyses", icon: "bar" },
-    { l: "Compte", h: "/dashboard/subscription", icon: "card" },
+  const mobileTabs = [
+    { l: t("sidebar_dashboard"), h: "/dashboard", icon: "dashboard" },
+    { l: t("sidebar_pubs"), h: "/dashboard/pubs", icon: "ads" },
+    { l: t("sidebar_generator"), h: "/dashboard/generator", icon: "generator" },
+    { l: t("sidebar_booster"), h: "/dashboard/booster", icon: "booster" },
+    { l: t("sidebar_subscription"), h: "/dashboard/subscription", icon: "billing" },
   ];
-
-  // Sidebar inline style — handles both mobile (fixed) and desktop (sticky)
-  const sidebarStyle = {
-    width: "252px",
-    flexShrink: 0,
-    background: "#070707",
-    borderRight: "1px solid #1A1A1A",
-    display: "flex",
-    flexDirection: "column",
-    height: "100vh",
-    zIndex: 40,
-    transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
-    ...(isDesktop ? {
-      position: "sticky",
-      top: 0,
-      transform: "none",
-    } : {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      transform: open ? "translateX(0)" : "translateX(-100%)",
-    }),
-  };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#090909" }}>
+    <div className="layout-shell">
+      <NotificationBanner />
 
-      {/* Mobile overlay */}
       {!isDesktop && open && (
-        <div
+        <button
+          type="button"
+          aria-label="Close navigation"
           onClick={() => setOpen(false)}
-          style={{
-            position: "fixed", inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            zIndex: 35,
-            backdropFilter: "blur(3px)",
-          }}
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
         />
       )}
 
-      {/* ─── SIDEBAR ─── */}
-      <aside style={sidebarStyle}>
-
-        {/* Gold signature line */}
-        <div style={{ height: "2px", background: "linear-gradient(90deg, transparent, #C6A15B 40%, #D4B87A 60%, transparent)", flexShrink: 0 }} />
-
-        {/* Brand */}
-        <div style={{ padding: "18px 16px 16px", borderBottom: "1px solid #141414", flexShrink: 0 }}>
-          <Link to="/" style={{ display: "flex", alignItems: "center", gap: "11px", textDecoration: "none" }}>
-            {/* Logo mark */}
-            <div style={{
-              width: "34px", height: "34px",
-              background: "linear-gradient(135deg, rgba(198,161,91,0.15), rgba(198,161,91,0.05))",
-              border: "1px solid rgba(198,161,91,0.25)",
-              borderRadius: "9px",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-            </div>
-            <div>
-              <div style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white", lineHeight: 1.1 }}>
-                Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
-              </div>
-              <div style={{ fontSize: "9px", color: theme.color, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginTop: "3px" }}>
-                {theme.label}{theme.emoji ? ` ${theme.emoji}` : ""}
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        {/* Nav */}
-        <nav style={{ flex: 1, overflowY: "auto", padding: "12px 10px", scrollbarWidth: "none" }}>
-          {navGroups.map((group, gi) => (
-            <div key={group.key} style={{ marginBottom: "4px", marginTop: gi > 0 ? "20px" : "0" }}>
-              <div style={{ padding: "0 8px 6px", fontSize: "9px", fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "#383838" }}>
-                {group.label}
-              </div>
-              {group.items.map((item, ii) => {
-                const active = isActive(item.h);
-                return (
-                  <Link
-                    key={ii}
-                    to={item.h}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      padding: "9px 10px",
-                      borderRadius: "8px",
-                      marginBottom: "1px",
-                      textDecoration: "none",
-                      transition: "all 0.15s ease",
-                      background: active ? "rgba(198,161,91,0.08)" : "transparent",
-                      borderLeft: active ? "2px solid #C6A15B" : "2px solid transparent",
-                      paddingLeft: "9px",
-                    }}
-                    onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
-                    onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <span style={{ color: active ? "#C6A15B" : "#4A4A4A", flexShrink: 0, display: "flex" }}>
-                      {Icons[item.icon]}
-                    </span>
-                    <span style={{ fontSize: "13px", fontWeight: active ? 600 : 400, color: active ? "white" : "#666", flex: 1, lineHeight: 1 }}>
-                      {item.l}
-                    </span>
-                    {item.badge > 0 && (
-                      <span style={{ minWidth: "18px", height: "18px", background: "#C6A15B", color: "#080808", borderRadius: "9px", fontSize: "10px", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>
-                        {item.badge}
-                      </span>
-                    )}
-                    {item.premium && !item.badge && (
-                      <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: active ? "#C6A15B" : "#2A2A2A", flexShrink: 0 }} />
-                    )}
+      <div className="relative z-10 flex min-h-screen">
+        <aside
+          className="fixed lg:sticky top-0 left-0 z-40 h-screen w-[310px] max-w-[86vw] transition-transform duration-300"
+          style={{
+            transform: isDesktop || open ? "translateX(0)" : "translateX(-100%)",
+          }}
+        >
+          <div className="h-full p-4 lg:p-5">
+            <div className="h-full rounded-[30px] border backdrop-blur-xl overflow-hidden" style={{ background: "linear-gradient(180deg, rgba(12,12,12,0.92), rgba(8,8,8,0.96))", borderColor: "rgba(255,255,255,0.08)", boxShadow: "0 24px 80px rgba(0,0,0,0.45)" }}>
+              <div className="h-full flex flex-col">
+                <div className="px-5 pt-5 pb-4 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <Link to="/" className="flex items-center gap-3 no-underline">
+                    <BrandMark />
+                    <div>
+                      <div className="text-[1.05rem] leading-none font-extrabold tracking-[-0.04em] text-white font-brand">
+                        Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+                      </div>
+                      <div className="mt-1 text-[11px] uppercase tracking-[0.26em]" style={{ color: theme.accent }}>
+                        {theme.label}
+                      </div>
+                    </div>
                   </Link>
-                );
-              })}
-            </div>
-          ))}
-        </nav>
 
-        {/* User footer */}
-        <div style={{ padding: "12px 10px 14px", borderTop: "1px solid #141414", flexShrink: 0 }}>
-          {user && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px", borderRadius: "10px", background: "#0D0D0D", border: "1px solid #1A1A1A", marginBottom: "10px" }}>
-              <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "linear-gradient(135deg, rgba(198,161,91,0.2), rgba(198,161,91,0.08))", border: "1px solid rgba(198,161,91,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 800, color: "#C6A15B", flexShrink: 0 }}>
-                {user.name ? user.name.charAt(0).toUpperCase() : "?"}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "12px", fontWeight: 600, color: "white", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
-                <div style={{ fontSize: "10px", color: "#555", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</div>
+                  <div className="mt-5 card-gold p-4">
+                    <div className="text-[11px] uppercase tracking-[0.24em]" style={{ color: "#C6A15B" }}>
+                      {t("common_current_plan")}
+                    </div>
+                    <div className="mt-2 text-white text-sm font-semibold">{theme.label}</div>
+                    <div className="text-xs mt-1" style={{ color: "#BDAE92" }}>{theme.detail}</div>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-4 py-5">
+                  {navGroups.map((group) => (
+                    <div key={group.key} className="mb-7">
+                      <div className="px-2 mb-3 text-[10px] uppercase tracking-[0.24em]" style={{ color: "#6C6458" }}>
+                        {group.label}
+                      </div>
+                      <div className="space-y-2">
+                        {group.items.map((item) => (
+                          <SidebarLink key={item.h} item={item} active={isActive(item.h)} onClick={() => setOpen(false)} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="px-4 py-4 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  {user && (
+                    <div className="glass-card px-4 py-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-extrabold" style={{ background: "rgba(198,161,91,0.12)", color: "#C6A15B", border: "1px solid rgba(198,161,91,0.18)" }}>
+                          {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm text-white font-semibold truncate">{user.name}</div>
+                          <div className="text-xs truncate" style={{ color: "#8A8378" }}>{user.email}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <LanguageSwitcher style={{ width: "100%", marginBottom: "10px" }} />
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="w-full flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold transition-all"
+                    style={{ background: "rgba(255,255,255,0.04)", color: "#B8B1A6", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    {Icons.logout}
+                    {t("sidebar_logout")}
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        </aside>
+
+        <main className="relative flex-1 min-w-0">
+          {!isDesktop && (
+            <header className="sticky top-0 z-20 px-4 pt-4">
+              <div className="mobile-nav-blur rounded-[22px] border px-4 py-3 flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "#D5CDBF", border: "1px solid rgba(255,255,255,0.08)" }}
+                >
+                  {Icons.menu}
+                </button>
+                <Link to="/" className="text-white font-extrabold tracking-[-0.04em] text-base font-brand no-underline">
+                  Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+                </Link>
+                <div className="w-11" />
+              </div>
+            </header>
           )}
-          <LanguageSwitcher style={{ marginBottom: "8px" }} />
-          <button
-            onClick={logout}
-            style={{ width: "100%", display: "flex", alignItems: "center", gap: "8px", padding: "8px 10px", borderRadius: "8px", background: "transparent", border: "none", cursor: "pointer", color: "#555", fontSize: "12px", fontWeight: 500, transition: "all 0.15s ease" }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#999"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "#555"; e.currentTarget.style.background = "transparent"; }}
-          >
-            <span style={{ display: "flex" }}>{Icons.logout}</span>
-            {t("sidebar_logout")}
-          </button>
-        </div>
-      </aside>
 
-      {/* ─── MAIN ─── */}
-      <main style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
-
-        {/* Mobile top bar */}
-        {!isDesktop && (
-          <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: "56px", background: "#070707", borderBottom: "1px solid #141414", position: "sticky", top: 0, zIndex: 20, flexShrink: 0 }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(198,161,91,0.5), transparent)" }} />
-            <button
-              onClick={() => setOpen(true)}
-              style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: "#111", border: "1px solid #1E1E1E", borderRadius: "9px", color: "#777", cursor: "pointer" }}
-            >
-              {Icons.menu}
-            </button>
-            <div style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>
-              Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+          <div className="relative z-10 px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8 pb-28 lg:pb-10">
+            <div className="mx-auto w-full max-w-[1180px]">
+              {children}
             </div>
-            <div style={{ width: "36px" }} />
-          </header>
-        )}
+          </div>
+        </main>
+      </div>
 
-        {/* Page content */}
-        <div style={{ flex: 1, padding: "clamp(24px, 4vw, 52px)", maxWidth: "1024px", width: "100%", margin: "0 auto", paddingBottom: isDesktop ? "52px" : "88px" }}>
-          {children}
-        </div>
-      </main>
-
-      {/* ─── MOBILE BOTTOM NAV ─── */}
       {!isDesktop && (
-        <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#070707", borderTop: "1px solid #161616", zIndex: 30 }}>
-          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(198,161,91,0.35), transparent)" }} />
-          <div style={{ display: "flex", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-            {bottomTabs.map((tab, i) => {
-              const active = isActive(tab.h);
+        <nav className="fixed bottom-0 left-0 right-0 z-30 px-3 pb-3">
+          <div className="mobile-nav-blur rounded-[24px] border px-2 py-2 flex items-center justify-between" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+            {mobileTabs.map((item) => {
+              const active = isActive(item.h);
               return (
                 <Link
-                  key={i}
-                  to={tab.h}
-                  style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", padding: "10px 4px", textDecoration: "none", color: active ? "#C6A15B" : "#444", transition: "color 0.15s ease", position: "relative" }}
+                  key={item.h}
+                  to={item.h}
+                  className="flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-2xl no-underline"
+                  style={active ? { background: "rgba(198,161,91,0.14)", color: "#F8F2E8" } : { color: "#81796E" }}
                 >
-                  {active && <div style={{ position: "absolute", top: 0, left: "25%", right: "25%", height: "1px", background: "#C6A15B" }} />}
-                  <span style={{ display: "flex" }}>{Icons[tab.icon]}</span>
-                  <span style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>{tab.l}</span>
+                  <span style={active ? { color: "#C6A15B" } : undefined}>{Icons[item.icon]}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em]">{item.l}</span>
                 </Link>
               );
             })}

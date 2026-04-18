@@ -169,6 +169,120 @@ def estimate_views(global_score: int, category: str, platform: str) -> dict:
     }
 
 
+def criterion_action_hint(label: str, category: str) -> str:
+    label_lower = label.lower()
+    mapping = [
+        (("hook",), "Travaillez la premiere seconde avec une promesse, un visuel fort ou un resultat montre tout de suite."),
+        (("call-to-action", "cta"), "Ajoutez une action simple et visible a la fin ou en milieu de video selon la plateforme."),
+        (("duree",), "Coupez les longueurs et gardez uniquement les moments qui font progresser la comprehension ou l'emotion."),
+        (("rythme", "montage", "transition"), "Resserrez le montage, supprimez les temps morts et donnez un changement visuel toutes les 1 a 2 secondes."),
+        (("clarte", "message"), "Rendez la promesse comprensible en moins de 3 secondes avec un texte clair ou une demonstration directe."),
+        (("emotion", "partage"), "Ajoutez un angle plus humain, une tension ou un benefice concret qui donne envie de partager."),
+        (("tendance", "format"), "Adaptez le format aux codes de la plateforme: cadrage, rythme, narration et habillage texte."),
+        (("qualite", "visuelle"), "Renforcez la lumiere, le cadrage et les plans de coupe pour faire plus pro sans complexifier le tournage."),
+        (("son", "musique", "audio"), "Ajoutez un son exploitable: voix claire, ambience maitrisee ou musique mieux synchronisee."),
+        (("engagement",), "Terminez par une question simple ou un angle qui appelle une reaction immediate."),
+    ]
+    for keywords, hint in mapping:
+        if any(keyword in label_lower for keyword in keywords):
+            return hint
+    return "Conservez le coeur du message, puis rendez ce point plus clair, plus rapide et plus facile a comprendre."
+
+
+def default_quick_take(score: int, category: str) -> str:
+    subject = "cette publicite" if category == "pubs" else "cette video"
+    if score >= 85:
+        return f"{subject.capitalize()} est deja solide: il faut surtout amplifier ce qui fonctionne pour viser plus haut."
+    if score >= 70:
+        return f"{subject.capitalize()} a un bon potentiel, mais 2 ou 3 ajustements bien choisis peuvent nettement augmenter son impact."
+    if score >= 50:
+        return f"{subject.capitalize()} a une base exploitable, mais elle manque encore d'un levier fort pour vraiment accelerer."
+    return f"{subject.capitalize()} a besoin d'une reprise plus structuree: le potentiel existe, mais il n'est pas encore assez visible."
+
+
+def build_priority_actions(criteria: list, category: str) -> list:
+    ranked = sorted(
+        [item for item in criteria if isinstance(item, dict)],
+        key=lambda item: item.get("score", 0)
+    )
+    actions = []
+    for index, criterion in enumerate(ranked[:3]):
+        score = criterion.get("score", 0)
+        actions.append({
+            "priority": index + 1,
+            "title": criterion.get("label", "Critere cle"),
+            "impact": "fort" if score < 45 else "moyen",
+            "why": criterion.get("description") or "Ce point freine actuellement la performance globale.",
+            "how": criterion_action_hint(criterion.get("label", ""), category),
+        })
+    return actions
+
+
+def build_beginner_take(criteria: list, score: int, category: str) -> dict:
+    ordered = sorted(
+        [item for item in criteria if isinstance(item, dict)],
+        key=lambda item: item.get("score", 0)
+    )
+    weakest = ordered[0] if ordered else {"label": "structure"}
+    return {
+        "what_it_means": default_quick_take(score, category),
+        "first_focus": f"Commencez par corriger {weakest.get('label', 'le point le plus faible').lower()}: c'est le levier le plus rapide a faire progresser.",
+        "mistake_to_avoid": "Ne modifiez pas tout d'un coup: gardez une seule idee forte par iteration pour savoir ce qui fait vraiment progresser le score.",
+    }
+
+
+def build_expert_take(criteria: list) -> dict:
+    ordered = sorted(
+        [item for item in criteria if isinstance(item, dict)],
+        key=lambda item: item.get("score", 0)
+    )
+    weakest = ordered[0] if ordered else {"label": "structure", "description": "a clarifier"}
+    strongest = ordered[-1] if ordered else {"label": "message", "description": "point d'appui"}
+    return {
+        "diagnosis": f"Le principal frein court terme est {weakest.get('label', 'le point faible').lower()}: {weakest.get('description', 'il reduit la performance globale')}",
+        "leverage": f"Le meilleur signal actuel est {strongest.get('label', 'votre point fort').lower()}. Il faut le conserver comme ancrage creatif.",
+        "test_to_run": f"Testez une variante qui conserve {strongest.get('label', 'le point fort').lower()} mais revoit totalement {weakest.get('label', 'le point faible').lower()}.",
+    }
+
+
+def build_watchouts(criteria: list, metadata: dict) -> list:
+    watchouts = []
+    ordered = sorted(
+        [item for item in criteria if isinstance(item, dict)],
+        key=lambda item: item.get("score", 0)
+    )
+    for criterion in ordered[:2]:
+        if criterion.get("score", 0) < 55:
+            watchouts.append(f"A surveiller: {criterion.get('label', 'critere cle')} reste un point fragile.")
+    if metadata.get("duration_seconds", 0) > 45:
+        watchouts.append("La duree peut fatiguer l'attention si chaque seconde n'apporte pas une information utile.")
+    if not metadata.get("has_audio"):
+        watchouts.append("Sans audio exploitable, la comprehension doit reposer encore plus sur le texte et le rythme visuel.")
+    return watchouts[:3]
+
+
+def normalize_analysis_result(result: dict, category: str, platform: str, metadata: dict) -> dict:
+    criteria = result.get("criteria") if isinstance(result.get("criteria"), list) else []
+    global_score = int(result.get("global_score", 50) or 50)
+    result["summary"] = result.get("summary") or default_quick_take(global_score, category)
+    result["quick_take"] = result.get("quick_take") or default_quick_take(global_score, category)
+    if not isinstance(result.get("tags"), list):
+        result["tags"] = []
+    if not isinstance(result.get("strengths"), list):
+        result["strengths"] = []
+    if not isinstance(result.get("weaknesses"), list):
+        result["weaknesses"] = []
+    if not isinstance(result.get("suggestions"), list):
+        result["suggestions"] = []
+    if "views_prediction" not in result or not isinstance(result.get("views_prediction"), dict):
+        result["views_prediction"] = estimate_views(global_score, category, platform)
+    result["priority_actions"] = result.get("priority_actions") if isinstance(result.get("priority_actions"), list) and result.get("priority_actions") else build_priority_actions(criteria, category)
+    result["beginner_take"] = result.get("beginner_take") if isinstance(result.get("beginner_take"), dict) else build_beginner_take(criteria, global_score, category)
+    result["expert_take"] = result.get("expert_take") if isinstance(result.get("expert_take"), dict) else build_expert_take(criteria)
+    result["watchouts"] = result.get("watchouts") if isinstance(result.get("watchouts"), list) and result.get("watchouts") else build_watchouts(criteria, metadata)
+    return result
+
+
 def build_analysis_prompt(category, platform, metadata, filename, learning_context=""):
     platform_name = platform_display_name(platform)
     cat_label = "publicite" if category == "pubs" else "video reseau social"
@@ -223,11 +337,32 @@ Reponds UNIQUEMENT en JSON:
 {{
   "global_score": <0-100>,
   "summary": "<2-3 phrases>",
+  "quick_take": "<1 phrase tres claire et accessible>",
   "tags": [{{"label": "<tag>", "type": "<positive|warning|negative>"}}],
   "criteria": [{{"label": "<emoji + nom>", "score": <0-100>, "description": "<1 phrase>"}}],
   "strengths": ["<point fort>"],
   "weaknesses": ["<point faible>"],
   "suggestions": ["<suggestion>"],
+  "priority_actions": [
+    {{
+      "priority": <1-3>,
+      "title": "<levier prioritaire>",
+      "impact": "<fort|moyen>",
+      "why": "<pourquoi c'est important>",
+      "how": "<comment l'ameliorer concretement>"
+    }}
+  ],
+  "beginner_take": {{
+    "what_it_means": "<ce que le score veut dire simplement>",
+    "first_focus": "<par quoi commencer>",
+    "mistake_to_avoid": "<erreur a eviter>"
+  }},
+  "expert_take": {{
+    "diagnosis": "<lecture plus pointue>",
+    "leverage": "<levier principal>",
+    "test_to_run": "<test prioritaire>"
+  }},
+  "watchouts": ["<point a surveiller>"],
   "views_prediction": {{
     "views_min": <nombre REALISTE>,
     "views_max": <nombre REALISTE>,
@@ -237,7 +372,7 @@ Reponds UNIQUEMENT en JSON:
   }}
 }}
 
-8 criteres, 3-5 tags, 2-4 forces, 2-3 faiblesses, 3-5 suggestions. Scores varies et realistes."""
+8 criteres, 3-5 tags, 2-4 forces, 2-3 faiblesses, 3-5 suggestions. Sois detaille mais facile a lire: donne une lecture simple pour debutant et une lecture plus fine pour expert. Scores varies et realistes."""
     return prompt
 
 
@@ -276,10 +411,7 @@ def analyze_with_claude(category, platform, file_path, filename, learning_contex
 
         result = json.loads(response_text)
 
-        if "views_prediction" not in result:
-            result["views_prediction"] = estimate_views(result.get("global_score", 50), category, platform)
-
-        return result
+        return normalize_analysis_result(result, category, platform, metadata)
 
     except json.JSONDecodeError as e:
         print(f"Erreur parsing JSON: {e}")
@@ -336,8 +468,8 @@ def analyze_fallback(category: str, platform: str, metadata: dict, filename: str
 
     views = estimate_views(global_score, category, platform)
 
-    return {
+    return normalize_analysis_result({
         "global_score": global_score, "summary": summary, "tags": tags[:5],
         "criteria": criteria, "strengths": strengths[:4], "weaknesses": weaknesses[:3],
         "suggestions": suggestions[:5], "views_prediction": views,
-    }
+    }, category, platform, metadata)

@@ -1,26 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LangProvider } from "./i18n/useLang.jsx";
-import NotificationBanner from "./components/NotificationBanner.jsx";
-import LandingPage from "./pages/LandingPage.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import AnalyzePubs from "./pages/AnalyzePubs.jsx";
-import AnalyzeReseaux from "./pages/AnalyzeReseaux.jsx";
-import Subscription from "./pages/Subscription.jsx";
-import Admin from "./pages/Admin.jsx";
-import Generator from "./pages/Generator.jsx";
-import Booster from "./pages/Booster.jsx";
-import AnalysesHistory from "./pages/AnalysesHistory.jsx";
-import GenerationsHistory from "./pages/GenerationsHistory.jsx";
-import ChatbotPage from "./pages/ChatbotPage.jsx";
-import ChatHistory from "./pages/ChatHistory.jsx";
+import { LangProvider } from "./src/i18n/useLang.jsx";
+import LandingPage from "./src/pages/LandingPage.jsx";
+import Login from "./src/pages/Login.jsx";
+import Register from "./src/pages/Register.jsx";
+import Dashboard from "./src/pages/Dashboard.jsx";
+import AnalyzePubs from "./src/pages/AnalyzePubs.jsx";
+import AnalyzeReseaux from "./src/pages/AnalyzeReseaux.jsx";
+import Subscription from "./src/pages/Subscription.jsx";
+import Admin from "./src/pages/Admin.jsx";
+import Generator from "./src/pages/Generator.jsx";
+import Booster from "./src/pages/Booster.jsx";
+import AnalysesHistory from "./src/pages/AnalysesHistory.jsx";
+import GenerationsHistory from "./src/pages/GenerationsHistory.jsx";
+import ChatbotPage from "./src/pages/ChatbotPage.jsx";
+import ChatHistory from "./src/pages/ChatHistory.jsx";
 
 function App() {
   return (
     <LangProvider>
       <BrowserRouter>
-        <NotificationBanner />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />

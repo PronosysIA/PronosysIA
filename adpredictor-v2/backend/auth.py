@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from pathlib import Path
 from jose import JWTError, jwt
 import bcrypt
 from fastapi import Depends, HTTPException, Request
@@ -11,9 +12,10 @@ import os
 from database import get_db
 from models import User
 
-load_dotenv()
+ENV_PATH = Path(__file__).resolve().with_name(".env")
+load_dotenv(ENV_PATH)
 
-SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY", "default-secret-key")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")

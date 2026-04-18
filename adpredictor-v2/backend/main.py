@@ -1,8 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 import os
 import stripe
 import json
@@ -22,7 +25,8 @@ from booster import generate_boost_strategy
 from chatbot import chat_with_ai_sync, build_analysis_context
 
 from dotenv import load_dotenv
-load_dotenv()
+ENV_PATH = Path(__file__).resolve().with_name(".env")
+load_dotenv(ENV_PATH)
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 
@@ -49,6 +53,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(OperationalError)
+async def handle_operational_error(request: Request, exc: OperationalError):
+    print(f"Database operational error on {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Service temporairement indisponible. Reessayez dans quelques secondes."},
+    )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def handle_sqlalchemy_error(request: Request, exc: SQLAlchemyError):
+    print(f"Database error on {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Connexion a la base temporairement indisponible."},
+    )
 
 try:
     Base.metadata.create_all(bind=engine)
@@ -203,10 +225,15 @@ async def analyze_video(request: Request, video: UploadFile = File(...), categor
         "id": analysis.id, "category": analysis.category, "platform": analysis.platform,
         "filename": analysis.filename, "global_score": analysis.global_score,
         "criteria_scores": result.get("criteria", []), "summary": analysis.summary,
+        "quick_take": result.get("quick_take"),
         "tags": result.get("tags", []),
         "strengths": result.get("strengths", []) if is_premium else None,
         "weaknesses": result.get("weaknesses", []) if is_premium else None,
         "suggestions": result.get("suggestions", []) if is_premium else None,
+        "priority_actions": result.get("priority_actions", []) if is_premium else None,
+        "beginner_take": result.get("beginner_take") if is_premium else None,
+        "expert_take": result.get("expert_take") if is_premium else None,
+        "watchouts": result.get("watchouts", []) if is_premium else None,
         "views_prediction": result.get("views_prediction"),
         "status": analysis.status, "created_at": analysis.created_at.isoformat()
     }
@@ -553,11 +580,17 @@ def get_scheduled_posts(user: User = Depends(require_user), db: Session = Depend
 def get_upcoming_posts(user: User = Depends(require_user), db: Session = Depends(get_db)):
     now = datetime.utcnow()
     soon = now + timedelta(minutes=15)
+    now_utc = datetime.now(timezone.utc)
     posts = db.query(ScheduledPost).filter(ScheduledPost.user_id == user.id, ScheduledPost.scheduled_at >= now, ScheduledPost.scheduled_at <= soon, ScheduledPost.status.in_(["scheduled", "notified_10", "notified_5"])).order_by(ScheduledPost.scheduled_at.asc()).all()
     result = []
     for p in posts:
-        minutes_left = (p.scheduled_at - now).total_seconds() / 60
-        result.append({"id": p.id, "platform": p.platform, "scheduled_at": p.scheduled_at.isoformat(), "title": p.title, "caption": p.caption, "hashtags": p.hashtags, "video_filename": p.video_filename, "minutes_left": round(minutes_left, 1), "status": p.status})
+        scheduled_at = p.scheduled_at
+        if scheduled_at.tzinfo is None:
+            scheduled_at = scheduled_at.replace(tzinfo=timezone.utc)
+        else:
+            scheduled_at = scheduled_at.astimezone(timezone.utc)
+        minutes_left = (scheduled_at - now_utc).total_seconds() / 60
+        result.append({"id": p.id, "platform": p.platform, "scheduled_at": scheduled_at.isoformat(), "title": p.title, "caption": p.caption, "hashtags": p.hashtags, "video_filename": p.video_filename, "minutes_left": round(minutes_left, 1), "status": p.status})
         if minutes_left <= 5 and p.status != "notified_5":
             p.status = "notified_5"
             db.commit()

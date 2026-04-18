@@ -3,7 +3,10 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ jsxRuntime: "automatic" })],
+  esbuild: {
+    jsxInject: 'import React from "react"',
+  },
   resolve: {
     alias: {
       "./i18n": path.resolve(__dirname, "./src/i18n"),

@@ -1,278 +1,445 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation, LanguageSwitcher } from "../i18n/useLang.jsx";
 
-function Counter({ end, suffix = "", duration = 2000 }) {
+function Counter({ end, suffix = "", duration = 1800 }) {
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     let start = 0;
     const step = end / (duration / 16);
-    const timer = setInterval(() => { start += step; if (start >= end) { setCount(end); clearInterval(timer); } else setCount(Math.floor(start)); }, 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
     return () => clearInterval(timer);
-  }, [end]);
+  }, [duration, end]);
+
   return <span className="counter-text">{count}{suffix}</span>;
 }
 
-const Check = () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>;
-const Arrow = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
+function Check() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+function Arrow() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  );
+}
 
 export default function LandingPage() {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
   const { t } = useTranslation();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const stats = [
+    { value: 8, suffix: "+", label: t("stat_criteria") },
+    { value: 7, suffix: "", label: t("stat_platforms") },
+    { value: 100, suffix: "", label: t("stat_score") },
+    { value: 90, suffix: "%", label: t("stat_accuracy") },
+  ];
+
+  const features = [
+    { title: t("feat_1_title"), desc: t("feat_1_desc"), accent: "#C6A15B" },
+    { title: t("feat_2_title"), desc: t("feat_2_desc"), accent: "#F1D59A" },
+    { title: t("feat_3_title"), desc: t("feat_3_desc"), accent: "#C6A15B" },
+    { title: t("feat_4_title"), desc: t("feat_4_desc"), accent: "#4ADE80" },
+    { title: t("feat_5_title"), desc: t("feat_5_desc"), accent: "#C6A15B" },
+    { title: t("feat_6_title"), desc: t("feat_6_desc"), accent: "#F1D59A" },
+  ];
+
+  const plans = [
+    {
+      title: t("pricing_free"),
+      price: "0EUR",
+      note: t("landing_plan_free_note"),
+      features: [t("price_free_1"), t("price_free_2"), t("price_free_3"), t("price_free_4")],
+      popular: false,
+    },
+    {
+      title: "Power",
+      price: "9,99EUR",
+      note: t("price_per_month"),
+      features: [t("price_power_1"), t("price_power_2"), t("price_power_3"), t("price_power_4")],
+      popular: false,
+    },
+    {
+      title: "Creator",
+      price: "9,99EUR",
+      note: t("price_per_month"),
+      features: [t("price_creator_1"), t("price_creator_2"), t("price_creator_3"), t("price_creator_4")],
+      popular: false,
+    },
+    {
+      title: "Combo Elite",
+      price: "11,99EUR",
+      note: t("price_per_month"),
+      features: [t("price_combo_1"), t("price_combo_2"), t("price_combo_3"), t("price_combo_4"), t("price_combo_5")],
+      popular: true,
+    },
+    {
+      title: t("pricing_enterprise"),
+      price: t("pricing_quote"),
+      note: t("landing_plan_enterprise_note"),
+      features: [t("price_enterprise_1"), t("price_enterprise_2"), t("price_enterprise_3"), t("price_enterprise_4"), t("price_enterprise_5")],
+      popular: false,
+      enterprise: true,
+    },
+  ];
 
   return (
-    <div className="min-h-screen grain" style={{ background: "#090909", position: "relative" }}>
-      {/* Gold grid background */}
-      <div style={{ position: "fixed", inset: 0, backgroundImage: "linear-gradient(rgba(198,161,91,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(198,161,91,0.018) 1px, transparent 1px)", backgroundSize: "48px 48px", pointerEvents: "none", zIndex: 0 }} />
+    <div className="min-h-screen grain relative overflow-hidden">
+      <div className="ambient-orb animate-drift" style={{ top: "8%", left: "-8%", width: "22rem", height: "22rem", background: "radial-gradient(circle, rgba(198,161,91,0.18), transparent 65%)" }} />
+      <div className="ambient-orb animate-drift" style={{ top: "18%", right: "-6%", width: "18rem", height: "18rem", background: "radial-gradient(circle, rgba(198,161,91,0.12), transparent 68%)", animationDelay: "1.2s" }} />
+      <div className="ambient-orb animate-drift" style={{ bottom: "6%", left: "22%", width: "16rem", height: "16rem", background: "radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%)", animationDelay: "2.4s" }} />
 
-      {/* ===== NAV ===== */}
-      <nav className="flex items-center justify-between px-8 md:px-16 py-6 max-w-7xl mx-auto animate-fadeIn relative z-10">
-        <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
-          <div style={{ width: "30px", height: "30px", background: "linear-gradient(135deg, rgba(198,161,91,0.15), rgba(198,161,91,0.05))", border: "1px solid rgba(198,161,91,0.25)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          </div>
-          <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "16px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
-        </Link>
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_features")}</a>
-          <a href="#process" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_process")}</a>
-          <a href="#pricing" className="text-sm transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_pricing")}</a>
-        </div>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          {user ? <Link to="/dashboard" className="btn-primary">{t("nav_dashboard")}</Link> : <>
-            <Link to="/login" className="text-sm px-4 py-2 transition-colors hover:text-white" style={{ color: "#AAA" }}>{t("nav_login")}</Link>
-            <Link to="/register" className="btn-primary">{t("nav_start")}</Link>
-          </>}
-        </div>
-      </nav>
-
-      {/* ===== HERO ===== */}
-      <section className="relative z-10" style={{ padding: "clamp(60px, 8vw, 120px) clamp(24px, 6vw, 80px) clamp(80px, 10vw, 140px)", maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Glow */}
-        <div style={{ position: "absolute", top: "20%", right: "10%", width: "500px", height: "500px", background: "radial-gradient(circle, rgba(198,161,91,0.04) 0%, transparent 65%)", pointerEvents: "none" }} className="animate-pulse-gold" />
-
-        {/* Badge */}
-        <div className="animate-fadeInUp" style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#C6A15B", boxShadow: "0 0 8px rgba(198,161,91,0.6)" }} className="animate-pulse-gold" />
-          <span style={{ fontFamily: "'Syne', sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "#C6A15B" }}>{t("hero_badge")}</span>
-          <div style={{ flex: 1, height: "1px", background: "linear-gradient(90deg, rgba(198,161,91,0.3), transparent)", maxWidth: "120px" }} />
-        </div>
-
-        {/* Title */}
-        <h1 className="animate-fadeInUp delay-100" style={{ fontFamily: "'Palatino Linotype', 'Palatino', Georgia, serif", fontSize: "clamp(44px, 7vw, 88px)", color: "white", fontStyle: "italic", lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: "24px", maxWidth: "900px" }}>
-          {t("hero_title_1")}<br />
-          <span style={{ color: "rgba(255,255,255,0.85)" }}>{t("hero_title_2")}</span>
-        </h1>
-
-        {/* Gold separator line */}
-        <div className="animate-fadeInUp delay-200" style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
-          <div style={{ width: "60px", height: "2px", background: "linear-gradient(90deg, #C6A15B, rgba(198,161,91,0.3))", borderRadius: "1px" }} />
-          <div style={{ width: "8px", height: "8px", background: "transparent", border: "1px solid #C6A15B", transform: "rotate(45deg)" }} />
-        </div>
-
-        <p className="animate-fadeInUp delay-300" style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "#C0C0C0", lineHeight: 1.7, marginBottom: "48px", maxWidth: "540px" }}>
-          {t("hero_desc")}
-        </p>
-
-        <div className="animate-fadeInUp delay-400" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px" }}>
-          <Link to={user ? "/dashboard" : "/register"} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#C6A15B", color: "white", padding: "14px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: 700, textDecoration: "none", fontFamily: "'Syne', sans-serif", transition: "all 0.2s ease" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#A8864A"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#C6A15B"; e.currentTarget.style.transform = "none"; }}
-          >
-            {user ? t("hero_cta_logged") : t("hero_cta")}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="pt-6 flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3 no-underline">
+            <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(198,161,91,0.24), rgba(198,161,91,0.08))", border: "1px solid rgba(198,161,91,0.22)" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C6A15B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            <div>
+              <div className="text-white font-extrabold tracking-[-0.05em] text-lg font-brand">
+                Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.24em]" style={{ color: "#8E836E" }}>
+                {t("landing_nav_tagline")}
+              </div>
+            </div>
           </Link>
-          <span style={{ fontSize: "13px", color: "#999" }}>{t("hero_no_card")}</span>
-        </div>
-      </section>
 
-      {/* ===== STATS BAR ===== */}
-      <div className="relative z-10" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(24px, 6vw, 80px)", marginBottom: "80px" }}>
-        <div style={{ background: "#0D0D0D", border: "1px solid #1A1A1A", borderRadius: "16px", overflow: "hidden", position: "relative" }}>
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, #C6A15B40, transparent)" }} />
-        <div className="grid grid-cols-2 md:grid-cols-4 animate-fadeInUp delay-700">
-          {[
-            { value: 8, suffix: "+", label: t("stat_criteria") },
-            { value: 5, suffix: "+", label: t("stat_platforms") },
-            { value: 100, suffix: "", label: t("stat_score") },
-            { value: 90, suffix: "%", label: t("stat_accuracy") },
-          ].map((s, i) => (
-            <div key={i} style={{ padding: "28px 20px", textAlign: "center", borderRight: i < 3 ? "1px solid #1A1A1A" : "none" }}>
-              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(28px, 4vw, 36px)", fontWeight: 800, color: "white", marginBottom: "6px", letterSpacing: "-0.03em" }}><Counter end={s.value} suffix={s.suffix} /></p>
-              <p style={{ fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "#AAA" }}>{s.label}</p>
+          <div className="hidden lg:flex items-center gap-7 text-sm" style={{ color: "#B6AEA2" }}>
+            <a href="#features" className="hover:text-white transition-colors">{t("nav_features")}</a>
+            <a href="#process" className="hover:text-white transition-colors">{t("nav_process")}</a>
+            <a href="#pricing" className="hover:text-white transition-colors">{t("nav_pricing")}</a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            {user ? (
+              <Link to="/dashboard" className="btn-gold">
+                {t("nav_dashboard")}
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="hidden sm:inline-flex btn-outline">
+                  {t("nav_login")}
+                </Link>
+                <Link to="/register" className="btn-gold">
+                  {t("nav_start")}
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
+
+        <section className="pt-14 pb-16 lg:pt-20 lg:pb-24 grid lg:grid-cols-[1.06fr_0.94fr] gap-10 items-center">
+          <div className="max-w-[700px]">
+            <div className="section-kicker animate-fadeInUp">
+              {t("hero_badge")}
             </div>
-          ))}
-        </div>
-        </div>
-      </div>
 
-      {/* ===== FEATURES ===== */}
-      <section id="features" className="px-8 py-32 max-w-6xl mx-auto relative z-10">
-        <div className="text-center mb-20">
-          <p className="text-[11px] uppercase tracking-widest mb-4 animate-fadeInUp" style={{ color: "#C6A15B" }}>{t("features_label")}</p>
-          <h2 className="font-display text-4xl md:text-5xl italic text-white animate-fadeInUp delay-100">
-            {t("features_title_1")}<br />{t("features_title_2")}
-          </h2>
-        </div>
+            <h1 className="mt-6 animate-fadeInUp delay-100 font-display text-white leading-[0.98] tracking-[-0.05em] text-[clamp(3.2rem,7vw,6.8rem)]">
+              {t("hero_title_1")} <span className="gold-text-gradient">{t("hero_title_2")}</span>
+            </h1>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px stagger-children" style={{ background: "#1C1C1C", borderRadius: "1.5rem", overflow: "hidden" }}>
-          {[
-            { title: t("feat_1_title"), desc: t("feat_1_desc"), accent: "#C6A15B", number: "01" },
-            { title: t("feat_2_title"), desc: t("feat_2_desc"), accent: "#C6A15B", number: "02" },
-            { title: t("feat_3_title"), desc: t("feat_3_desc"), accent: "#C6A15B", number: "03" },
-            { title: t("feat_4_title"), desc: t("feat_4_desc"), accent: "#4ADE80", number: "04" },
-            { title: t("feat_5_title"), desc: t("feat_5_desc"), accent: "#C6A15B", number: "05" },
-            { title: t("feat_6_title"), desc: t("feat_6_desc"), accent: "#C6A15B", number: "06" },
-          ].map((f, i) => (
-            <div key={i} className="p-8 md:p-10 group animate-fadeInUp relative overflow-hidden" style={{ background: "#0A0A0A" }}>
-              <div className="absolute top-0 left-0 w-full h-px" style={{ background: "linear-gradient(90deg, transparent, " + f.accent + "20, transparent)" }} />
-              <div className="flex items-start justify-between mb-8">
-                <span className="text-4xl font-display italic font-bold" style={{ color: "#3A3A3A" }}>{f.number}</span>
-                <div className="w-2 h-2 rounded-full mt-3 group-hover:scale-150 transition-transform" style={{ background: f.accent }} />
+            <p className="mt-6 max-w-[620px] text-[1.02rem] leading-8 animate-fadeInUp delay-200" style={{ color: "#C8C0B4" }}>
+              {t("hero_desc")}
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3 animate-fadeInUp delay-300">
+              <Link to={user ? "/dashboard" : "/register"} className="btn-gold px-7 py-4 text-base">
+                {user ? t("hero_cta_logged") : t("hero_cta")}
+                <Arrow />
+              </Link>
+              <div className="metric-pill">{t("hero_no_card")}</div>
+              <div className="metric-pill" style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.1)" }}>
+                {t("landing_proof")}
               </div>
-              <h3 className="text-white font-medium text-lg mb-3 group-hover:translate-x-1 transition-transform">{f.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#AAA" }}>{f.desc}</p>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* ===== HOW IT WORKS ===== */}
-      <section id="process" className="px-8 py-32 max-w-5xl mx-auto relative z-10">
-        <div className="divider mb-32" />
-        <div className="text-center mb-20">
-          <p className="text-[11px] uppercase tracking-widest mb-4 animate-fadeInUp" style={{ color: "#C6A15B" }}>{t("process_label")}</p>
-          <h2 className="font-display text-4xl md:text-5xl italic text-white animate-fadeInUp delay-100">
-            {t("process_title_1")}<br />{t("process_title_2")}
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { step: "01", title: t("step_1_title"), desc: t("step_1_desc"), detail: t("step_1_detail") },
-            { step: "02", title: t("step_2_title"), desc: t("step_2_desc"), detail: t("step_2_detail") },
-            { step: "03", title: t("step_3_title"), desc: t("step_3_desc"), detail: t("step_3_detail") },
-          ].map((s, i) => (
-            <div key={i} className="animate-fadeInUp group" style={{ animationDelay: `${i * 150}ms` }}>
-              <div className="mb-6">
-                <span className="text-6xl font-display italic font-bold transition-colors group-hover:text-white" style={{ color: "#444" }}>{s.step}</span>
+            <div className="mt-10 grid sm:grid-cols-3 gap-3 animate-fadeInUp delay-400">
+              <div className="glass-card px-5 py-4">
+                <div className="text-[11px] uppercase tracking-[0.24em]" style={{ color: "#806F50" }}>{t("landing_signal_fast")}</div>
+                <div className="mt-2 text-sm text-white font-semibold">{t("landing_signal_fast_desc")}</div>
               </div>
-              <h3 className="text-white text-xl font-medium mb-3">{s.title}</h3>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "#C0C0C0" }}>{s.desc}</p>
-              <p className="text-xs leading-relaxed" style={{ color: "#999" }}>{s.detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ===== SHOWCASE ===== */}
-      <section className="px-8 py-20 max-w-5xl mx-auto relative z-10">
-        <div className="card p-0 overflow-hidden animate-fadeInUp">
-          <div className="grid md:grid-cols-2">
-            <div className="p-12 md:p-16 flex flex-col justify-center">
-              <p className="text-[11px] uppercase tracking-widest mb-6" style={{ color: "#C6A15B" }}>{t("showcase_label")}</p>
-              <h3 className="font-display text-3xl italic text-white mb-4">{t("showcase_title")}</h3>
-              <p className="text-sm leading-relaxed mb-8" style={{ color: "#B0B0B0" }}>{t("showcase_desc")}</p>
-              <Link to={user ? "/dashboard/chatbot" : "/register"} className="btn-gold w-fit">{t("showcase_cta")}</Link>
-            </div>
-            <div className="p-8 flex items-center justify-center" style={{ background: "#0E0E0E" }}>
-              <div className="w-full max-w-xs space-y-3">
-                <div className="flex gap-2 justify-end"><div className="rounded-xl px-4 py-2 text-sm max-w-[80%]" style={{ background: "rgba(198,161,91,0.08)", color: "#C6A15B" }}>{t("showcase_chat_1")}</div></div>
-                <div className="flex gap-2"><div className="rounded-xl px-4 py-2 text-sm max-w-[85%]" style={{ background: "#1A1A1A", color: "#888" }}>{t("showcase_chat_2")}</div></div>
-                <div className="flex gap-2 justify-end"><div className="rounded-xl px-4 py-2 text-sm" style={{ background: "rgba(198,161,91,0.08)", color: "#C6A15B" }}>{t("showcase_chat_3")}</div></div>
-                <div className="flex gap-2"><div className="rounded-xl px-4 py-2 text-sm" style={{ background: "#1A1A1A", color: "#4ADE80" }}>✓ {t("showcase_chat_4")}</div></div>
+              <div className="glass-card px-5 py-4">
+                <div className="text-[11px] uppercase tracking-[0.24em]" style={{ color: "#806F50" }}>{t("landing_signal_layered")}</div>
+                <div className="mt-2 text-sm text-white font-semibold">{t("landing_signal_layered_desc")}</div>
+              </div>
+              <div className="glass-card px-5 py-4">
+                <div className="text-[11px] uppercase tracking-[0.24em]" style={{ color: "#806F50" }}>{t("landing_signal_conversion")}</div>
+                <div className="mt-2 text-sm text-white font-semibold">{t("landing_signal_conversion_desc")}</div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* ===== TESTIMONIAL ===== */}
-      <section className="px-8 py-20 max-w-4xl mx-auto relative z-10">
-        <div className="text-center animate-fadeInUp">
-          <div className="w-16 h-16 rounded-full mx-auto mb-8 flex items-center justify-center" style={{ background: "#141414", border: "1px solid #1C1C1C" }}>
-            <span className="text-2xl">💬</span>
+          <div className="relative min-h-[560px] sm:min-h-[640px] lg:min-h-[720px] animate-fadeInUp delay-300">
+            <div className="hero-orbit animate-pulse-gold" />
+            <div className="absolute top-[2%] left-[2%] z-20 glass-card px-4 py-3 animate-float" style={{ width: "220px" }}>
+              <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#8C7C60" }}>{t("landing_preview_headline")}</div>
+              <div className="mt-2 text-white text-lg font-semibold">92/100</div>
+              <div className="text-xs mt-1" style={{ color: "#C7BEAF" }}>{t("landing_preview_desc")}</div>
+            </div>
+
+            <div className="signal-card absolute left-1/2 top-[18%] z-10 w-[calc(100%-1.5rem)] max-w-[560px] -translate-x-1/2 p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.22em]" style={{ color: "#907B55" }}>{t("landing_preview_panel")}</div>
+                  <div className="mt-2 text-white font-display text-3xl">{t("landing_preview_title")}</div>
+                </div>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-extrabold" style={{ border: "1px solid rgba(198,161,91,0.24)", color: "#C6A15B", background: "rgba(198,161,91,0.08)" }}>
+                  86
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4">
+                <div className="card p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#887A62" }}>{t("landing_preview_quick")}</div>
+                      <div className="mt-2 text-white font-semibold">{t("landing_preview_quick_desc")}</div>
+                    </div>
+                    <span className="tag tag-gold">{t("result_score")}</span>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="card p-5">
+                    <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#8B7B5D" }}>{t("landing_preview_beginner")}</div>
+                    <p className="mt-2 text-sm text-white font-semibold">{t("landing_preview_beginner_desc")}</p>
+                    <p className="mt-2 text-xs" style={{ color: "#B7AE9E" }}>{t("landing_preview_beginner_note")}</p>
+                  </div>
+                  <div className="card p-5">
+                    <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#8B7B5D" }}>{t("landing_preview_expert")}</div>
+                    <p className="mt-2 text-sm text-white font-semibold">{t("landing_preview_expert_desc")}</p>
+                    <p className="mt-2 text-xs" style={{ color: "#B7AE9E" }}>{t("landing_preview_expert_note")}</p>
+                  </div>
+                </div>
+
+                <div className="card-gold p-5">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <span className="tag tag-gold">{t("sidebar_generator")}</span>
+                    <span className="tag">{t("sidebar_booster")}</span>
+                    <span className="tag">{t("sidebar_chatbot")}</span>
+                  </div>
+                  <p className="text-sm text-white font-semibold">{t("landing_preview_stack")}</p>
+                  <p className="text-xs mt-2" style={{ color: "#C8B896" }}>{t("landing_preview_stack_desc")}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute right-[2%] bottom-[4%] z-20 glass-card px-4 py-3 animate-float" style={{ width: "230px", animationDelay: "1.8s" }}>
+              <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#8B7B5D" }}>{t("landing_growth_card")}</div>
+              <div className="mt-2 text-white text-sm font-semibold">{t("landing_growth_card_desc")}</div>
+            </div>
           </div>
-          <blockquote className="font-display text-2xl md:text-3xl italic text-white leading-snug mb-8 max-w-2xl mx-auto">
-            "{t("testimonial_quote")}"
-          </blockquote>
-          <p className="text-sm" style={{ color: "#999" }}>— {t("testimonial_author")}</p>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== PRICING ===== */}
-      <section id="pricing" className="px-8 py-32 max-w-6xl mx-auto relative z-10">
-        <div className="divider mb-32" />
-        <div className="text-center mb-20">
-          <p className="text-[11px] uppercase tracking-widest mb-4 animate-fadeInUp" style={{ color: "#C6A15B" }}>{t("pricing_label")}</p>
-          <h2 className="font-display text-4xl md:text-5xl italic text-white animate-fadeInUp delay-100">{t("pricing_title")}</h2>
-          <p className="text-base mt-4 animate-fadeInUp delay-200" style={{ color: "#B0B0B0" }}>{t("pricing_desc")}</p>
-        </div>
+        <section className="pb-16 lg:pb-24">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat, index) => (
+              <div key={stat.label} className="card p-6 animate-fadeInUp" style={{ animationDelay: `${index * 80}ms` }}>
+                <div className="text-3xl md:text-4xl text-white font-extrabold tracking-[-0.05em]">
+                  <Counter end={stat.value} suffix={stat.suffix} />
+                </div>
+                <div className="mt-2 text-[11px] uppercase tracking-[0.22em]" style={{ color: "#8A8173" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 stagger-children">
-          {[
-            { title: t("pricing_free"), price: "0\u20AC", note: "", features: [t("price_free_1"), t("price_free_2"), t("price_free_3"), t("price_free_4")], popular: false },
-            { title: "Power \u26A1", price: "9,99\u20AC", note: t("price_per_month"), features: [t("price_power_1"), t("price_power_2"), t("price_power_3"), t("price_power_4")], popular: false },
-            { title: "Creator \u{1F525}", price: "9,99\u20AC", note: t("price_per_month"), features: [t("price_creator_1"), t("price_creator_2"), t("price_creator_3"), t("price_creator_4")], popular: false },
-            { title: "Combo Elite \u{1F48E}", price: "11,99\u20AC", note: t("price_per_month"), features: [t("price_combo_1"), t("price_combo_2"), t("price_combo_3"), t("price_combo_4"), t("price_combo_5")], popular: true },
-            { title: t("pricing_enterprise"), price: t("pricing_quote"), note: "", features: [t("price_enterprise_1"), t("price_enterprise_2"), t("price_enterprise_3"), t("price_enterprise_4"), t("price_enterprise_5")], popular: false, enterprise: true },
-          ].map((p, i) => (
-            <div key={i} className="card animate-fadeInUp" style={p.popular ? { border: "1px solid #C6A15B" } : {}}>
-              {p.popular && <div className="text-center py-2 text-[10px] font-semibold tracking-widest uppercase text-white" style={{ background: "#C6A15B", borderRadius: "1rem 1rem 0 0" }}>{t("pricing_popular")}</div>}
-              <div className="p-6">
-                <h3 className="text-white font-medium mb-3 text-sm">{p.title}</h3>
-                <div className="mb-6"><span className="text-3xl font-display italic text-white">{p.price}</span><span className="text-xs ml-1" style={{ color: "#999" }}>{p.note}</span></div>
-                <ul className="space-y-2.5 mb-6">{p.features.map((f, j) => <li key={j} className="flex items-start gap-2 text-xs" style={{ color: "#888" }}><span style={{ color: "#C6A15B" }} className="mt-0.5"><Check /></span>{f}</li>)}</ul>
-                {p.enterprise ? (
-                  <a href="mailto:PronosysIA.Help@outlook.com?subject=Demande%20devis%20Entreprise%20PronosysIA" className="block text-center py-2.5 rounded-lg text-xs font-semibold transition-all hover:-translate-y-1 text-white border" style={{ borderColor: "#333" }}>{t("pricing_contact")}</a>
+        <section id="features" className="py-16 lg:py-24">
+          <div className="max-w-[680px] mb-12">
+            <div className="section-kicker">{t("features_label")}</div>
+            <h2 className="mt-5 font-display text-white text-[clamp(2.4rem,5vw,4.8rem)] leading-[1.02] tracking-[-0.04em]">
+              {t("features_title_1")} <span className="gold-text-gradient">{t("features_title_2")}</span>
+            </h2>
+            <p className="mt-5 text-base leading-8" style={{ color: "#C8C0B4" }}>
+              {t("landing_features_subtitle")}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-5 stagger-children">
+            {features.map((feature, index) => (
+              <div key={feature.title} className="card p-7 animate-fadeInUp">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-[11px] uppercase tracking-[0.22em]" style={{ color: feature.accent }}>{String(index + 1).padStart(2, "0")}</span>
+                  <div className="w-2.5 h-2.5 rounded-full animate-pulse-gold" style={{ background: feature.accent }} />
+                </div>
+                <h3 className="mt-6 text-white text-xl font-semibold">{feature.title}</h3>
+                <p className="mt-3 text-sm leading-7" style={{ color: "#BEB6A9" }}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="process" className="py-16 lg:py-24">
+          <div className="divider mb-14" />
+          <div className="grid lg:grid-cols-[0.86fr_1.14fr] gap-8 items-start">
+            <div>
+              <div className="section-kicker">{t("process_label")}</div>
+              <h2 className="mt-5 font-display text-white text-[clamp(2.2rem,4.5vw,4.2rem)] leading-[1.03] tracking-[-0.04em]">
+                {t("process_title_1")} <span className="gold-text-gradient">{t("process_title_2")}</span>
+              </h2>
+              <p className="mt-5 text-base leading-8" style={{ color: "#C8C0B4" }}>
+                {t("landing_process_subtitle")}
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 stagger-children">
+              {[
+                { step: "01", title: t("step_1_title"), desc: t("step_1_desc"), detail: t("step_1_detail") },
+                { step: "02", title: t("step_2_title"), desc: t("step_2_desc"), detail: t("step_2_detail") },
+                { step: "03", title: t("step_3_title"), desc: t("step_3_desc"), detail: t("step_3_detail") },
+              ].map((item) => (
+                <div key={item.step} className="card p-6 animate-fadeInUp">
+                  <div className="text-5xl font-display gold-text-gradient">{item.step}</div>
+                  <h3 className="mt-6 text-white text-xl font-semibold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7" style={{ color: "#BEB6A9" }}>{item.desc}</p>
+                  <p className="mt-4 text-xs leading-6" style={{ color: "#8F887C" }}>{item.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 lg:py-24">
+          <div className="card-gold p-8 lg:p-12 grid lg:grid-cols-[0.92fr_1.08fr] gap-8 items-center">
+            <div>
+              <div className="section-kicker">{t("showcase_label")}</div>
+              <h3 className="mt-5 font-display text-white text-[clamp(2rem,4vw,3.4rem)] leading-[1.04] tracking-[-0.04em]">
+                {t("showcase_title")}
+              </h3>
+              <p className="mt-5 text-base leading-8" style={{ color: "#D8CCB1" }}>{t("showcase_desc")}</p>
+              <Link to={user ? "/dashboard/chatbot" : "/register"} className="btn-primary mt-8">
+                {t("showcase_cta")}
+                <Arrow />
+              </Link>
+            </div>
+
+            <div className="grid gap-4">
+              <div className="card p-5 ml-auto max-w-[82%]">
+                <div className="text-[11px] uppercase tracking-[0.2em]" style={{ color: "#8B7B5D" }}>{t("showcase_chat_1")}</div>
+                <div className="mt-2 text-white text-sm font-semibold">{t("landing_chat_reply_1")}</div>
+              </div>
+              <div className="card p-5 max-w-[92%]">
+                <div className="text-white text-sm font-semibold">{t("showcase_chat_2")}</div>
+              </div>
+              <div className="card p-5 ml-auto max-w-[76%]">
+                <div className="text-white text-sm font-semibold">{t("showcase_chat_3")}</div>
+              </div>
+              <div className="card p-5 max-w-[88%]">
+                <div className="text-sm font-semibold" style={{ color: "#4ADE80" }}>{t("showcase_chat_4")}</div>
+                <div className="mt-2 text-xs" style={{ color: "#B8AF9E" }}>{t("landing_chat_reply_2")}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="py-16 lg:py-24">
+          <div className="divider mb-14" />
+          <div className="max-w-[720px]">
+            <div className="section-kicker">{t("pricing_label")}</div>
+            <h2 className="mt-5 font-display text-white text-[clamp(2.2rem,4.8vw,4.5rem)] leading-[1.03] tracking-[-0.04em]">
+              {t("pricing_title")}
+            </h2>
+            <p className="mt-5 text-base leading-8" style={{ color: "#C8C0B4" }}>
+              {t("pricing_desc")}
+            </p>
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-5 gap-4 stagger-children">
+            {plans.map((plan) => (
+              <div key={plan.title} className={plan.popular ? "card-gold p-6 animate-fadeInUp" : "card p-6 animate-fadeInUp"}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-semibold text-white">{plan.title}</div>
+                    <div className="text-[11px] uppercase tracking-[0.18em] mt-1" style={{ color: plan.popular ? "#C6A15B" : "#8A8173" }}>
+                      {plan.popular ? t("pricing_popular") : plan.note}
+                    </div>
+                  </div>
+                  {plan.popular && <span className="tag tag-gold">{t("landing_best_value")}</span>}
+                </div>
+
+                <div className="mt-6 text-white font-display text-4xl tracking-[-0.04em]">{plan.price}</div>
+                {!plan.popular && <div className="text-xs mt-2" style={{ color: "#8A8173" }}>{plan.note}</div>}
+
+                <ul className="mt-6 space-y-3">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-3 text-sm" style={{ color: "#C7BFB2" }}>
+                      <span style={{ color: "#C6A15B", marginTop: "3px" }}><Check /></span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.enterprise ? (
+                  <a href="mailto:PronosysIA.Help@outlook.com?subject=Demande%20devis%20Entreprise%20PronosysIA" className="btn-outline mt-7 w-full">
+                    {t("pricing_contact")}
+                  </a>
                 ) : (
-                  <Link to="/register" className={`block text-center py-2.5 rounded-lg text-xs font-semibold transition-all hover:-translate-y-1 ${p.popular ? "text-white" : "text-white border"}`}
-                    style={p.popular ? { background: "#C6A15B" } : { borderColor: "#333" }}>
-                    {p.popular ? t("pricing_start") : t("pricing_choose")}
+                  <Link to={user ? "/dashboard/subscription" : "/register"} className={plan.popular ? "btn-gold mt-7 w-full" : "btn-outline mt-7 w-full"}>
+                    {plan.popular ? t("pricing_start") : t("pricing_choose")}
                   </Link>
                 )}
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <p className="text-center text-sm mt-10 animate-fadeInUp delay-500" style={{ color: "#888" }}>{t("pricing_footer")}</p>
-      </section>
+          <p className="text-center text-sm mt-8" style={{ color: "#A79C8B" }}>{t("pricing_footer")}</p>
+        </section>
 
-      {/* ===== CTA FINAL ===== */}
-      <section className="px-8 py-20 max-w-4xl mx-auto relative z-10">
-        <div className="relative rounded-2xl p-16 md:p-20 text-center overflow-hidden animate-fadeInUp" style={{ background: "#0E0E0E", border: "1px solid #1C1C1C" }}>
-          {/* Gold glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] rounded-full pointer-events-none animate-pulse-gold" style={{ background: "radial-gradient(ellipse, rgba(198,161,91,0.08) 0%, transparent 70%)" }} />
-
-          <div className="relative z-10">
-            <h2 className="font-display text-4xl md:text-5xl italic text-white mb-6">{t("cta_title")}</h2>
-            <p className="text-base mb-12 max-w-md mx-auto" style={{ color: "#B0B0B0" }}>{t("cta_desc")}</p>
-            <Link to={user ? "/dashboard" : "/register"} className="btn-gold px-12 py-4 text-base inline-flex items-center gap-3">
-              {t("cta_button")} <Arrow />
+        <section className="py-16 lg:py-24">
+          <div className="card-gold px-8 py-12 lg:px-14 lg:py-16 text-center">
+            <div className="section-kicker justify-center">{t("landing_final_kicker")}</div>
+            <h2 className="mt-6 font-display text-white text-[clamp(2.2rem,5vw,4.6rem)] leading-[1.02] tracking-[-0.04em]">
+              {t("cta_title")}
+            </h2>
+            <p className="mt-5 max-w-[720px] mx-auto text-base leading-8" style={{ color: "#D6C8AB" }}>
+              {t("cta_desc")}
+            </p>
+            <Link to={user ? "/dashboard" : "/register"} className="btn-primary mt-8 px-8 py-4">
+              {t("cta_button")}
+              <Arrow />
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="relative z-10 px-8 py-12 max-w-6xl mx-auto" style={{ borderTop: "1px solid #1C1C1C" }}>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <span style={{ fontFamily: "'Syne', 'Inter', sans-serif", fontWeight: 800, fontSize: "15px", letterSpacing: "-0.03em", color: "white" }}>Pronosys<span style={{ color: "#C6A15B" }}>IA</span></span>
-            <span className="text-xs" style={{ color: "#888" }}>{t("footer_tagline")}</span>
+        <footer className="py-10 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+            <div>
+              <div className="text-white font-extrabold tracking-[-0.05em] text-lg font-brand">
+                Pronosys<span style={{ color: "#C6A15B" }}>IA</span>
+              </div>
+              <div className="text-sm mt-1" style={{ color: "#968D80" }}>{t("footer_tagline")}</div>
+            </div>
+            <div className="flex items-center gap-6 text-sm" style={{ color: "#B8AFA1" }}>
+              <a href="#features" className="hover:text-white transition-colors">{t("nav_features")}</a>
+              <a href="#process" className="hover:text-white transition-colors">{t("nav_process")}</a>
+              <a href="#pricing" className="hover:text-white transition-colors">{t("nav_pricing")}</a>
+            </div>
           </div>
-          <div className="flex items-center gap-8">
-            <a href="#features" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_features")}</a>
-            <a href="#pricing" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_pricing")}</a>
-            <Link to="/login" className="text-xs transition-colors hover:text-white" style={{ color: "#777" }}>{t("nav_login")}</Link>
+          <div className="mt-8 text-xs text-center" style={{ color: "#756C61" }}>
+            &copy; 2026 PronosysIA. {t("footer_copyright")}
           </div>
-        </div>
-        <div className="mt-8 pt-8" style={{ borderTop: "1px solid #141414" }}>
-          <p className="text-xs text-center" style={{ color: "#666" }}>&copy; 2026 PronosysIA. {t("footer_copyright")}</p>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
